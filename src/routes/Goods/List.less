@@ -1,0 +1,97 @@
+@import '~antd/lib/style/themes/default.less';
+
+.goodsList {
+  :global {
+    .ant-avatar-lg {
+      width: 68px;
+      height: 68px;
+      line-height: 68px;
+    }
+  }
+
+  .title {
+    width: 240px;
+  }
+  .listContent {
+    font-size: 0;
+    .listContentItem {
+      color: @text-color-secondary;
+      display: inline-block;
+      vertical-align: middle;
+      font-size: @font-size-base;
+      margin-left: 40px;
+      > p {
+        margin-top: 4px;
+        margin-bottom: 0;
+        line-height: 22px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: @screen-xs) {
+  .goodsList {
+    :global {
+      .ant-list-item-content {
+        width: 100%;
+      }
+    }
+    .listContent {
+      margin-left: 0;
+      & > div {
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: @screen-md) {
+  .goodsList {
+    :global {
+      .ant-list-item {
+        flex-direction: column;
+        align-items: normal;
+      }
+      .ant-list-item-content {
+        display: block;
+        flex: none;
+      }
+      .ant-list-item-action {
+        margin-left: 0;
+      }
+    }
+    .listContent {
+      & > div {
+        display: block;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: @screen-lg) and (min-width: @screen-md) {
+  .goodsList {
+    .listContent {
+      & > div {
+        display: block;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: @screen-xl) {
+  .goodsList {
+    .listContent {
+      & > div {
+        margin-left: 24px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1400px) {
+  .goodsList {
+    .listContent {
+      text-align: right;
+    }
+  }
+}
