@@ -4,7 +4,6 @@ import { connect } from 'dva';
 
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
-import styles from './Manage.less';
 import {getRoutes} from "../../utils/utils";
 
 @connect()
