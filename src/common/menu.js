@@ -11,12 +11,8 @@ const menuData = [
         path: 'manage/list',
       },
       {
-        name: '商品属性组',
-        path: 'goods-property/list',
-      },
-      {
-        name: '商品属性值',
-        path: 'workplace',
+        name: '商品类别',
+        path: 'goods-type/list',
       },
     ],
   },

@@ -1,8 +1,7 @@
-import { message } from 'antd';
-import { query, submitGoodsPropertyForm, getOne, save, remove } from '../services/goodsProperty';
+import { query, getOne, save, remove } from '../services/goodsType';
 
 export default {
-  namespace: 'goodsProperty',
+  namespace: 'goodsType',
 
   state: {
     data: {
@@ -34,10 +33,6 @@ export default {
     *remove({ payload, callback }, { call }) {
       yield call(remove, payload);
       if (callback) callback();
-    },
-    *submitGoodsPropertyForm({ payload }, { call }) {
-      yield call(submitGoodsPropertyForm, payload);
-      message.success('提交成功');
     },
   },
 

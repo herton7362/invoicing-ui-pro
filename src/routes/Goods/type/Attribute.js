@@ -10,9 +10,7 @@ export default (record) => {
       title: '可选值列表',
       render: (val, row) => (
         <Fragment>
-          {row.goodsPropertyValueResults.map(value => (
-            value.name
-          )).join('，')}
+          {row.attrValues}
         </Fragment>
       ),
     },
@@ -22,7 +20,7 @@ export default (record) => {
     <Table
       rowKey="id"
       columns={columns}
-      dataSource={record.goodsPropertyResults}
+      dataSource={record.goodsAttributes}
       pagination={false}
     />
   );
