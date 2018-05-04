@@ -17,7 +17,7 @@ const { TextArea } = Input;
         value: formData.name,
       }),
       attrValues: Form.createFormField({
-        value: formData.attrValues,
+        value: formData.attrValues? formData.attrValues.replace(/,/g, '\n'): null,
       }),
     };
   },
@@ -27,29 +27,30 @@ export default class GoodsTypeForm extends PureComponent {
     // Focus the text input using the raw DOM API
     setTimeout(() => {
       if (element.input) element.input.focus()
-    }, 500);
+    }, 200);
   };
 
   okHandle = () => {
     const {
       form,
       onSaveSuccess,
-      handleModalVisible,
+      handleAttrModalVisible,
       dispatch,
-      formData,
+      goodsAttribute: { formData },
     } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       form.resetFields();
       dispatch({
-        type: 'goodsType/save',
+        type: 'goodsAttribute/save',
         payload: {
+          ...formData,
           ...fieldsValue,
-          id: formData.id,
+          attrValues: fieldsValue.attrValues.trim().replace(/\n+/g, '\n').replace(/\n/g, ','),
         },
       }).then(() => {
-        handleModalVisible();
+        handleAttrModalVisible();
         onSaveSuccess();
       });
     });

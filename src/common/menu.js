@@ -8,7 +8,7 @@ const menuData = [
     children: [
       {
         name: '商品列表',
-        path: 'manage/list',
+        path: 'list',
       },
       {
         name: '商品类别',

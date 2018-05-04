@@ -1,7 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 
 import { connect } from "dva/index";
-import { Card, Divider, Table, Button, message, Popconfirm } from 'antd';
+import { Card, Divider, Table, Button, message, Popconfirm, Input } from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import attribute from './Attribute';
 import GoodsTypeForm from './GoodsTypeForm';
@@ -9,9 +9,11 @@ import AttributeForm from './AttributeForm';
 
 import styles from './GoodsType.less';
 
+const { Search } = Input;
 
-@connect(({ goodsType, loading }) => ({
+@connect(({ goodsType, goodsAttribute, loading }) => ({
   goodsType,
+  goodsAttribute,
   loading: loading.models.goodsType || loading.models.goodsAttribute,
 }))
 export default class GoodsTypeList extends PureComponent {
@@ -102,12 +104,35 @@ export default class GoodsTypeList extends PureComponent {
     this.handleModalVisible(true);
   };
 
-  handleOpenAddAttrModal = () => {
+  handleOpenAddAttrModal = goodsTypeId => {
     this.props.dispatch({
       type: 'goodsAttribute/getOne',
-      payload: {},
+      payload: {
+        goodsTypeId,
+      },
     });
     this.handleAttrModalVisible(true);
+  };
+
+  handleOpenEditAttrModal = id => {
+    this.props.dispatch({
+      type: 'goodsAttribute/fetchOne',
+      payload: {id},
+    });
+    this.handleAttrModalVisible(true);
+  };
+
+  handleAttrRemove = id => {
+    this.props.dispatch({
+      type: 'goodsAttribute/remove',
+      payload: {
+        id,
+      },
+      callback: () => {
+        this.handleSearch();
+        message.success('删除成功');
+      },
+    });
   };
 
   render() {
@@ -121,6 +146,13 @@ export default class GoodsTypeList extends PureComponent {
       {
         title: '商品类别名称',
         dataIndex: 'name',
+      },
+      {
+        title: '属性',
+        render: (val, record) => (
+          record.goodsAttributes && record.goodsAttributes.length > 0?
+            record.goodsAttributes.map(attr => attr.name): '未配置'
+        ),
       },
       {
         title: '操作',
@@ -152,11 +184,16 @@ export default class GoodsTypeList extends PureComponent {
     };
 
     return (
-      <PageHeaderLayout title="商品属性">
-        <Card bordered={false}>
-          <div className={styles.goodsType}>
+      <PageHeaderLayout>
+        <div className={styles.goodsType}>
+          <Card
+            bordered={false}
+            title="商品属性"
+            bodyStyle={{ padding: '0 32px 40px 32px' }}
+            extra={<Search className={styles.extraContentSearch} placeholder="请输入" onSearch={(name) => this.handleSearch({name})} />}
+          >
             <div className={styles.operator}>
-              <Button icon="plus" type="primary" onClick={this.handleOpenAddModal}>
+              <Button type="dashed" style={{ width: '100%', marginBottom: 8 }} icon="plus" onClick={this.handleOpenAddModal}>
                 新建
               </Button>
             </div>
@@ -167,12 +204,12 @@ export default class GoodsTypeList extends PureComponent {
               pagination={paginationProps}
               columns={columns}
               onChange={this.handleStandardTableChange}
-              expandedRowRender={attribute}
+              expandedRowRender={record => attribute(record, this.handleOpenEditAttrModal, this.handleAttrRemove)}
             />
-          </div>
-        </Card>
-        {!loading && <GoodsTypeForm {...parentMethods} modalVisible={modalVisible} />}
-        {!loading && <AttributeForm {...parentMethods} modalVisible={attrModalVisible} />}
+          </Card>
+          {!loading && <GoodsTypeForm {...parentMethods} modalVisible={modalVisible} />}
+          {!loading && <AttributeForm {...parentMethods} modalVisible={attrModalVisible} />}
+        </div>
       </PageHeaderLayout>
     );
   }

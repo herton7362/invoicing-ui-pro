@@ -1,10 +1,11 @@
 import React, { PureComponent } from 'react';
-
 import { connect } from "dva/index";
-import { Card, List, Avatar, Menu, Dropdown, Icon, Tooltip } from 'antd';
+import { Card, List, Avatar, Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
+import { routerRedux } from 'dva/router';
 import Ellipsis from 'components/Ellipsis';
 import numeral from 'numeral';
 import { getImgServerPath } from "../../utils/utils";
+import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
 import styles from './List.less';
 
@@ -31,6 +32,10 @@ export default class GoodsList extends PureComponent {
     });
   };
 
+  handleOpenAddModal = () => {
+    this.props.dispatch(routerRedux.push('/goods/modify'));
+  }
+
   render() {
     const { goods: { list, total }, loading } = this.props;
 
@@ -46,10 +51,6 @@ export default class GoodsList extends PureComponent {
         data: {
           basicGoodsPrice: { retailPrice },
           costPrice,
-          weight,
-          length,
-          width,
-          height,
         },
       }) => (
         <div className={styles.listContent}>
@@ -58,17 +59,11 @@ export default class GoodsList extends PureComponent {
             <p>利润：￥ {numeral(retailPrice - costPrice).format('0,0.0')}</p>
           </div>
           <div className={styles.listContentItem}>
-            <p>重量：{numeral(weight).format('0.00')} kg</p>
-            <p>长度：{numeral(length).format('0.00')} kg</p>
-            <p>宽度：{numeral(width).format('0.00')} kg</p>
-            <p>高度：{numeral(height).format('0.00')} kg</p>
-          </div>
-          <div className={styles.listContentItem}>
             <p>库存：10 件</p>
             <p><a>查看库存</a></p>
           </div>
         </div>
-    );
+      );
 
     const menu = item => (
       <Menu>
@@ -95,27 +90,34 @@ export default class GoodsList extends PureComponent {
     const avatarPath = (attachId) => (attachId?`${getImgServerPath()}/attachment/download/${attachId}`: '/none-img.jpg');
 
     return (
-      <div className={styles.goodsList}>
-        <Card bordered={false}>
-          <List
-            size="large"
-            rowKey="id"
-            loading={loading}
-            pagination={paginationProps}
-            dataSource={list}
-            renderItem={item => (
-              <List.Item actions={[<a>编辑</a>, <MoreBtn item={item} />]}>
-                <List.Item.Meta
-                  avatar={<Avatar src={avatarPath(item.goodsCoverImage.attachmentId)} shape="square" size="large" />}
-                  title={<Tooltip title={item.name}><Ellipsis className={styles.title} lines={1}>{item.name}</Ellipsis></Tooltip>}
-                  description={item.code}
-                />
-                <ListContent data={item} />
-              </List.Item>
-            )}
-          />
-        </Card>
-      </div>
+      <PageHeaderLayout>
+        <div className={styles.goodsList}>
+          <Card bordered={false}>
+            <div className={styles.operator}>
+              <Button type="primary" icon="plus" onClick={this.handleOpenAddModal}>
+                新建
+              </Button>
+            </div>
+            <List
+              size="large"
+              rowKey="id"
+              loading={loading}
+              pagination={paginationProps}
+              dataSource={list}
+              renderItem={item => (
+                <List.Item actions={[<a>编辑</a>, <MoreBtn item={item} />]}>
+                  <List.Item.Meta
+                    avatar={<Avatar src={avatarPath(item.goodsCoverImage.attachmentId)} shape="square" size="large" />}
+                    title={<Tooltip title={item.name}><Ellipsis className={styles.title} lines={1}>{item.name}</Ellipsis></Tooltip>}
+                    description={item.code}
+                  />
+                  <ListContent data={item} />
+                </List.Item>
+              )}
+            />
+          </Card>
+        </div>
+      </PageHeaderLayout>
     );
   }
 }

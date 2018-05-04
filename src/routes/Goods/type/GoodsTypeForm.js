@@ -23,7 +23,7 @@ export default class GoodsTypeForm extends PureComponent {
     // Focus the text input using the raw DOM API
     setTimeout(() => {
       if (element.input) element.input.focus()
-    }, 500);
+    }, 200);
   };
 
   okHandle = () => {
@@ -32,7 +32,7 @@ export default class GoodsTypeForm extends PureComponent {
       onSaveSuccess,
       handleModalVisible,
       dispatch,
-      formData,
+      goodsType: { formData },
     } = this.props;
 
     form.validateFields((err, fieldsValue) => {

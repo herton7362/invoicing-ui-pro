@@ -72,11 +72,12 @@ export const getRouterData = app => {
     '/': {
       component: dynamicWrapper(app, ['user', 'login'], () => import('../layouts/BasicLayout')),
     },
-    '/goods/manage': {
-      component: dynamicWrapper(app, [], () => import('../routes/Goods/Manage')),
-    },
-    '/goods/manage/list': {
+    '/goods/list': {
       component: dynamicWrapper(app, ['goods'], () => import('../routes/Goods/List')),
+    },
+    '/goods/modify': {
+      component: dynamicWrapper(app, ['goods', 'goodsCategory'], () => import('../routes/Goods/Form')),
+      name: '商品维护',
     },
     '/goods/goods-type/list': {
       component: dynamicWrapper(app, ['goodsType', 'goodsAttribute'], () => import('../routes/Goods/type/GoodsType')),
