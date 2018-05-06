@@ -1,0 +1,32 @@
+.dropdownSelector {
+  display: flex;
+  :global {
+    .ant-select {
+      width: 100%;
+    }
+  }
+  .field {
+    flex: 1;
+  }
+  .addHandlerWrapper {
+    :global {
+      .ant-select-tree-node-content-wrapper {
+        width: 100% !important;
+      }
+      .ant-select-tree-switcher {
+        display: none !important;
+      }
+    }
+  }
+  .addHandler {
+    display: block;
+    padding-left: 60px;
+  }
+  .editHandlerWrapper {
+    width: 36px;
+  }
+  .editHandler {
+    margin-left: 8px;
+  }
+}
+

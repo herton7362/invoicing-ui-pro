@@ -1,4 +1,4 @@
-import { query } from '../services/goodsCategory';
+import { query, save, getOne } from '../services/goodsCategory';
 
 export default {
   namespace: 'goodsCategory',
@@ -19,6 +19,17 @@ export default {
         payload: response,
       });
     },
+    *fetchOne({ payload }, { call, put }) {
+      const response = yield call(getOne, payload);
+      yield put({
+        type: 'getOne',
+        payload: response,
+      });
+    },
+    *save({ payload, callback }, { call }) {
+      yield call(save, payload);
+      if (callback) callback();
+    },
   },
 
   reducers: {
@@ -26,17 +37,17 @@ export default {
       return {
         ...state,
         data: {
-          list: (Array.isArray(action.payload.content) ? action.payload.content : []).map(item => ({
-            ...item,
-            pId: item.parentId,
-            title: item.name,
-            value: item.id,
-            key: item.id,
-          })),
+          list: Array.isArray(action.payload.content) ? action.payload.content : [],
           pagination: {
             total: action.payload.totalElements,
           },
         },
+      };
+    },
+    getOne(state, action) {
+      return {
+        ...state,
+        formData: action.payload,
       };
     },
   },

@@ -34,7 +34,7 @@ export default class GoodsList extends PureComponent {
 
   handleOpenAddModal = () => {
     this.props.dispatch(routerRedux.push('/goods/modify'));
-  }
+  };
 
   render() {
     const { goods: { list, total }, loading } = this.props;
