@@ -5,15 +5,15 @@ export function getAuthority() {
 }
 
 export function setAuthority(authority, expiresIn) {
-  if(!authority) {
+  if (!authority) {
     localStorage.removeItem('_a');
   } else {
     localStorage.setItem('_a', btoa(authority));
   }
-  if(!expiresIn) {
+  if (!expiresIn) {
     localStorage.removeItem('_e');
   } else {
-    localStorage.setItem('_e', `${new Date().getTime() + ((expiresIn / 2) * 1000)}`);
+    localStorage.setItem('_e', `${new Date().getTime() + expiresIn / 2 * 1000}`);
   }
 }
 
@@ -22,16 +22,16 @@ let refreshInterval;
 export function refreshAuthority(appId, authority) {
   localStorage.setItem('_t', btoa(appId));
   localStorage.setItem('_t2', btoa(authority));
-  refreshInterval = setInterval(()=>{
+  refreshInterval = setInterval(() => {
     const a = atob(localStorage.getItem('_t'));
-    if(!checkAuthority() && a) {
+    if (!checkAuthority() && a) {
       const id = atob(localStorage.getItem('_t'));
       request(`/refresh/token`, {
         headers: {
           appId: id,
           refreshToken: a,
         },
-      }).then((response)=> {
+      }).then(response => {
         setAuthority(response.data.accessToken, response.data.expiresIn);
       });
     }

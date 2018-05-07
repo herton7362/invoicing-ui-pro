@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 
-import { connect } from "dva/index";
+import { connect } from 'dva/index';
 import { Card, Divider, Table, Button, message, Popconfirm, Input } from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import attribute from './Attribute';
@@ -33,7 +33,7 @@ export default class GoodsTypeList extends PureComponent {
     this.handleSearch();
   };
 
-  handleSearch = (params) => {
+  handleSearch = params => {
     const { dispatch } = this.props;
     const { currentPage, pageSize } = this.state;
     dispatch({
@@ -99,7 +99,7 @@ export default class GoodsTypeList extends PureComponent {
   handleOpenEditModal = id => {
     this.props.dispatch({
       type: 'goodsType/fetchOne',
-      payload: {id},
+      payload: { id },
     });
     this.handleModalVisible(true);
   };
@@ -117,7 +117,7 @@ export default class GoodsTypeList extends PureComponent {
   handleOpenEditAttrModal = id => {
     this.props.dispatch({
       type: 'goodsAttribute/fetchOne',
-      payload: {id},
+      payload: { id },
     });
     this.handleAttrModalVisible(true);
   };
@@ -136,10 +136,7 @@ export default class GoodsTypeList extends PureComponent {
   };
 
   render() {
-    const {
-      goodsType: {data: { list, pagination }},
-      loading,
-    } = this.props;
+    const { goodsType: { data: { list, pagination } }, loading } = this.props;
     const { modalVisible, attrModalVisible, pageSize } = this.state;
 
     const columns = [
@@ -149,10 +146,10 @@ export default class GoodsTypeList extends PureComponent {
       },
       {
         title: '属性',
-        render: (val, record) => (
-          record.goodsAttributes && record.goodsAttributes.length > 0?
-            record.goodsAttributes.map(attr => attr.name): '未配置'
-        ),
+        render: (val, record) =>
+          record.goodsAttributes && record.goodsAttributes.length > 0
+            ? record.goodsAttributes.map(attr => attr.name)
+            : '未配置',
       },
       {
         title: '操作',
@@ -162,7 +159,10 @@ export default class GoodsTypeList extends PureComponent {
             <Divider type="vertical" />
             <a onClick={() => this.handleOpenAddAttrModal(record.id)}>添加属性</a>
             <Divider type="vertical" />
-            <Popconfirm title={`确定删除${record.name}吗?`} onConfirm={() => this.handleRemove(record.id)}>
+            <Popconfirm
+              title={`确定删除${record.name}吗?`}
+              onConfirm={() => this.handleRemove(record.id)}
+            >
               <a>删除</a>
             </Popconfirm>
           </Fragment>
@@ -190,10 +190,21 @@ export default class GoodsTypeList extends PureComponent {
             bordered={false}
             title="商品属性"
             bodyStyle={{ padding: '0 32px 40px 32px' }}
-            extra={<Search className={styles.extraContentSearch} placeholder="请输入" onSearch={(name) => this.handleSearch({name})} />}
+            extra={
+              <Search
+                className={styles.extraContentSearch}
+                placeholder="请输入"
+                onSearch={name => this.handleSearch({ name })}
+              />
+            }
           >
             <div className={styles.operator}>
-              <Button type="dashed" style={{ width: '100%', marginBottom: 8 }} icon="plus" onClick={this.handleOpenAddModal}>
+              <Button
+                type="dashed"
+                style={{ width: '100%', marginBottom: 8 }}
+                icon="plus"
+                onClick={this.handleOpenAddModal}
+              >
                 新建
               </Button>
             </div>
@@ -204,7 +215,9 @@ export default class GoodsTypeList extends PureComponent {
               pagination={paginationProps}
               columns={columns}
               onChange={this.handleStandardTableChange}
-              expandedRowRender={record => attribute(record, this.handleOpenEditAttrModal, this.handleAttrRemove)}
+              expandedRowRender={record =>
+                attribute(record, this.handleOpenEditAttrModal, this.handleAttrRemove)
+              }
             />
           </Card>
           {!loading && <GoodsTypeForm {...parentMethods} modalVisible={modalVisible} />}

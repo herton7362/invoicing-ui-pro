@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 
-import { connect } from "dva/index";
+import { connect } from 'dva/index';
 import { Modal, Form, Input } from 'antd';
 
 const FormItem = Form.Item;
@@ -22,7 +22,7 @@ export default class GoodsTypeForm extends PureComponent {
   focusTextInput = element => {
     // Focus the text input using the raw DOM API
     setTimeout(() => {
-      if (element.input) element.input.focus()
+      if (element.input) element.input.focus();
     }, 200);
   };
 
@@ -52,11 +52,7 @@ export default class GoodsTypeForm extends PureComponent {
   };
 
   render() {
-    const {
-      modalVisible,
-      form: { getFieldDecorator },
-      handleModalVisible,
-    } = this.props;
+    const { modalVisible, form: { getFieldDecorator }, handleModalVisible } = this.props;
 
     const formItemLayout = {
       labelCol: {

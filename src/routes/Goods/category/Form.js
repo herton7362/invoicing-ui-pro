@@ -1,13 +1,14 @@
 import React, { PureComponent } from 'react';
 
-import { connect } from "dva/index";
-import { Modal, Form, Input } from 'antd';
+import { connect } from 'dva/index';
+import { Modal, Form, Input, Button, Popconfirm } from 'antd';
 import CategorySelector from './CategorySelector';
 
 const FormItem = Form.Item;
 
-@connect(({ goodsCategory }) => ({
+@connect(({ goodsCategory, loading }) => ({
   goodsCategory,
+  submitting: loading.effects['goodsCategory/save'],
 }))
 @Form.create({
   mapPropsToFields(props) {
@@ -26,11 +27,11 @@ export default class GoodsCategoryForm extends PureComponent {
   focusTextInput = element => {
     // Focus the text input using the raw DOM API
     setTimeout(() => {
-      if (element.input) element.input.focus()
+      if (element.input) element.input.focus();
     }, 200);
   };
 
-  okHandle = () => {
+  handleOk = () => {
     const {
       form,
       onSaveSuccess,
@@ -45,22 +46,33 @@ export default class GoodsCategoryForm extends PureComponent {
       dispatch({
         type: 'goodsCategory/save',
         payload: {
+          ...formData,
           ...fieldsValue,
-          id: formData.id,
         },
-      }).then(() => {
-        handleModalVisible();
-        onSaveSuccess();
+        callback: response => {
+          handleModalVisible();
+          onSaveSuccess(response);
+        },
       });
     });
   };
 
+  handleRemove = () => {
+    const { onSaveSuccess, handleModalVisible, dispatch, goodsCategory: { formData } } = this.props;
+    dispatch({
+      type: 'goodsCategory/remove',
+      payload: {
+        id: formData.id,
+      },
+      callback: () => {
+        handleModalVisible();
+        onSaveSuccess();
+      },
+    });
+  };
+
   render() {
-    const {
-      modalVisible,
-      form: { getFieldDecorator },
-      handleModalVisible,
-    } = this.props;
+    const { modalVisible, form: { getFieldDecorator }, onCancel, submitting } = this.props;
 
     const formItemLayout = {
       labelCol: {
@@ -77,8 +89,17 @@ export default class GoodsCategoryForm extends PureComponent {
       <Modal
         title="商品分类维护"
         visible={modalVisible}
-        onOk={this.okHandle}
-        onCancel={() => handleModalVisible()}
+        footer={[
+          <Popconfirm key="delete" title="确定删除吗?" onConfirm={this.handleRemove}>
+            <Button type="danger">删除</Button>
+          </Popconfirm>,
+          <Button key="cancel" onClick={() => onCancel()}>
+            取消
+          </Button>,
+          <Button key="submit" type="primary" loading={submitting} onClick={this.handleOk}>
+            保存
+          </Button>,
+        ]}
       >
         <FormItem {...formItemLayout} label="上级类别" extra="没有上级分类可以留空">
           {getFieldDecorator('parentId')(<CategorySelector allowClear showHandler={false} />)}

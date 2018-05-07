@@ -29,7 +29,7 @@ export default {
     getOne(state, action) {
       return {
         ...state,
-        formData: action.payload,
+        formData: action.payload || {},
       };
     },
   },

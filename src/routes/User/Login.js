@@ -69,7 +69,6 @@ export default class LoginPage extends Component {
           <Submit loading={submitting}>登录</Submit>
           <div className={styles.other}>
             其他登录方式：暂无
-
             <Link className={styles.register} to="/user/register">
               注册账户
             </Link>

@@ -52,7 +52,7 @@ export default function request(url, options) {
     },
   };
 
-  if(checkAuthority()) {
+  if (checkAuthority()) {
     defaultOptions.headers = {
       ...defaultOptions.headers,
       Authorization: `Bearer ${getAuthority()}`,

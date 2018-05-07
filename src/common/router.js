@@ -76,13 +76,16 @@ export const getRouterData = app => {
       component: dynamicWrapper(app, ['goods'], () => import('../routes/Goods/List')),
     },
     '/goods/modify': {
-      component: dynamicWrapper(app, ['goods', 'goodsCategory'], () => import('../routes/Goods/Form')),
+      component: dynamicWrapper(app, ['goods', 'goodsCategory'], () =>
+        import('../routes/Goods/Form')
+      ),
       name: '商品维护',
     },
     '/goods/goods-type/list': {
-      component: dynamicWrapper(app, ['goodsType', 'goodsAttribute'], () => import('../routes/Goods/type/GoodsType')),
+      component: dynamicWrapper(app, ['goodsType', 'goodsAttribute'], () =>
+        import('../routes/Goods/type/GoodsType')
+      ),
     },
-
 
     '/dashboard/analysis': {
       component: dynamicWrapper(app, ['chart'], () => import('../routes/Dashboard/Analysis')),

@@ -1,10 +1,12 @@
-import { query, disable } from '../services/goods';
+import { query, save, disable, getOne } from '../services/goods';
 
 export default {
   namespace: 'goods',
 
   state: {
     list: [],
+    total: 0,
+    formData: {},
   },
 
   effects: {
@@ -14,6 +16,17 @@ export default {
         type: 'queryList',
         payload: response,
       });
+    },
+    *fetchOne({ payload }, { call, put }) {
+      const response = yield call(getOne, payload);
+      yield put({
+        type: 'getOne',
+        payload: response,
+      });
+    },
+    *save({ payload, callback }, { call }) {
+      const response = yield call(save, payload);
+      if (callback) callback(response);
     },
     *disable({ payload }, { call }) {
       yield call(disable, payload);
@@ -26,6 +39,12 @@ export default {
         ...state,
         list: Array.isArray(action.payload.content) ? action.payload.content : [],
         total: action.payload.totalElements,
+      };
+    },
+    getOne(state, action) {
+      return {
+        ...state,
+        formData: action.payload || {},
       };
     },
   },

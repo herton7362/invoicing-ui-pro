@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react';
-import { connect } from "dva/index";
+import { connect } from 'dva/index';
 import { Card, List, Avatar, Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
 import { routerRedux } from 'dva/router';
 import Ellipsis from 'components/Ellipsis';
 import numeral from 'numeral';
-import { getImgServerPath } from "../../utils/utils";
+import { getImgServerPath } from '../../utils/utils';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
 import styles from './List.less';
@@ -36,6 +36,15 @@ export default class GoodsList extends PureComponent {
     this.props.dispatch(routerRedux.push('/goods/modify'));
   };
 
+  handleOpenEditModal = ({ id }) => {
+    this.props
+      .dispatch({
+        type: 'goods/fetchOne',
+        payload: { id },
+      })
+      .then(() => this.props.dispatch(routerRedux.push('/goods/modify')));
+  };
+
   render() {
     const { goods: { list, total }, loading } = this.props;
 
@@ -46,37 +55,30 @@ export default class GoodsList extends PureComponent {
       total,
     };
 
-    const ListContent = (
-      {
-        data: {
-          basicGoodsPrice: { retailPrice },
-          costPrice,
-        },
-      }) => (
-        <div className={styles.listContent}>
-          <div className={styles.listContentItem}>
-            <p>价格：￥ {numeral(retailPrice).format('0,0.0')}</p>
-            <p>利润：￥ {numeral(retailPrice - costPrice).format('0,0.0')}</p>
-          </div>
-          <div className={styles.listContentItem}>
-            <p>库存：10 件</p>
-            <p><a>查看库存</a></p>
-          </div>
+    const ListContent = ({ data: { basicGoodsPrice: { retailPrice }, costPrice } }) => (
+      <div className={styles.listContent}>
+        <div className={styles.listContentItem}>
+          <p>价格：￥ {numeral(retailPrice).format('0,0.0')}</p>
+          <p>利润：￥ {numeral(retailPrice - costPrice).format('0,0.0')}</p>
         </div>
-      );
+        <div className={styles.listContentItem}>
+          <p>库存：10 件</p>
+          <p>
+            <a>查看sku</a>
+          </p>
+        </div>
+      </div>
+    );
 
     const menu = item => (
       <Menu>
-        <Menu.Item>
-          <a>编辑</a>
-        </Menu.Item>
         <Menu.Item>
           <a onClick={() => this.handleDisable(item)}>删除</a>
         </Menu.Item>
       </Menu>
     );
 
-    const MoreBtn = ( props ) => {
+    const MoreBtn = props => {
       const { item } = props;
       return (
         <Dropdown overlay={menu(item)}>
@@ -87,7 +89,8 @@ export default class GoodsList extends PureComponent {
       );
     };
 
-    const avatarPath = (attachId) => (attachId?`${getImgServerPath()}/attachment/download/${attachId}`: '/none-img.jpg');
+    const avatarPath = attachId =>
+      attachId ? `${getImgServerPath()}/attachment/download/${attachId}` : '/none-img.jpg';
 
     return (
       <PageHeaderLayout>
@@ -105,10 +108,27 @@ export default class GoodsList extends PureComponent {
               pagination={paginationProps}
               dataSource={list}
               renderItem={item => (
-                <List.Item actions={[<a>编辑</a>, <MoreBtn item={item} />]}>
+                <List.Item
+                  actions={[
+                    <a onClick={() => this.handleOpenEditModal(item)}>编辑</a>,
+                    <MoreBtn item={item} />,
+                  ]}
+                >
                   <List.Item.Meta
-                    avatar={<Avatar src={avatarPath(item.goodsCoverImage.attachmentId)} shape="square" size="large" />}
-                    title={<Tooltip title={item.name}><Ellipsis className={styles.title} lines={1}>{item.name}</Ellipsis></Tooltip>}
+                    avatar={
+                      <Avatar
+                        src={avatarPath(item.goodsCoverImage.attachmentId)}
+                        shape="square"
+                        size="large"
+                      />
+                    }
+                    title={
+                      <Tooltip title={item.name}>
+                        <Ellipsis className={styles.title} lines={1}>
+                          {item.name}
+                        </Ellipsis>
+                      </Tooltip>
+                    }
                     description={item.code}
                   />
                   <ListContent data={item} />

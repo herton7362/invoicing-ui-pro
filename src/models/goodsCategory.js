@@ -1,4 +1,4 @@
-import { query, save, getOne } from '../services/goodsCategory';
+import { query, save, getOne, remove } from '../services/goodsCategory';
 
 export default {
   namespace: 'goodsCategory',
@@ -27,7 +27,11 @@ export default {
       });
     },
     *save({ payload, callback }, { call }) {
-      yield call(save, payload);
+      const response = yield call(save, payload);
+      if (callback) callback(response);
+    },
+    *remove({ payload, callback }, { call }) {
+      yield call(remove, payload);
       if (callback) callback();
     },
   },
@@ -47,7 +51,7 @@ export default {
     getOne(state, action) {
       return {
         ...state,
-        formData: action.payload,
+        formData: action.payload || {},
       };
     },
   },

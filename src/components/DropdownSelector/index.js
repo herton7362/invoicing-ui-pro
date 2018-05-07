@@ -12,12 +12,12 @@ class DropdownSelector extends Component {
   };
   componentWillReceiveProps(nextProps) {
     if ('value' in nextProps) {
-      const { value }  = nextProps;
+      const { value } = nextProps;
       this.setState({ value });
     }
   }
-  triggerChange = (changedValue) => {
-    if(changedValue === '_add') {
+  triggerChange = changedValue => {
+    if (changedValue === '_add') {
       this.props.onAdd();
       return;
     }
@@ -42,23 +42,35 @@ class DropdownSelector extends Component {
   renderEditHandler = (onEdit, value) => {
     return (
       <div className={styles.editHandlerWrapper}>
-        <a className={styles.editHandler} onClick={() => onEdit(value)}><Icon type="edit" /></a>
+        <a className={styles.editHandler} onClick={() => onEdit(value)}>
+          <Icon type="edit" />
+        </a>
       </div>
     );
   };
   renderTreeData = (list, parentId = null) => {
-    return list.map(item => (
-      (item.parentId === parentId || (!list.some(i => i.id === item.parentId) && parentId === null)) &&
-      (
-        <TreeNode value={item.id} title={item.name} key={item.id}>
-          {this.renderTreeData(list, item.id)}
-        </TreeNode>
-      )
-    )).filter(item => item);
+    return list
+      .map(item => {
+        if (
+          item.parentId === parentId ||
+          (!list.some(i => i.id === item.parentId) && parentId === null)
+        ) {
+          const children = this.renderTreeData(list, item.id);
+          return (
+            <TreeNode value={item.id} title={item.name} key={item.id}>
+              {children.length > 0 && children}
+            </TreeNode>
+          );
+        }
+        return null;
+      })
+      .filter(item => item);
   };
-  renderContent = (data) => {
+  renderContent = data => {
     const { showHandler } = this.props;
-    return [this.renderTreeData(data), showHandler && this.renderAddMoreHandler()].filter(item => item);
+    return [this.renderTreeData(data), showHandler && this.renderAddMoreHandler()].filter(
+      item => item
+    );
   };
   render() {
     const {
@@ -84,7 +96,7 @@ class DropdownSelector extends Component {
       <div className={styles.dropdownSelector} {...rest}>
         <div className={styles.field}>
           <TreeSelect
-            value={loading? 'noData': value}
+            value={loading ? 'noData' : value}
             showSearch={showSearch}
             placeholder={placeholder}
             allowClear={allowClear}
@@ -95,11 +107,16 @@ class DropdownSelector extends Component {
             onSearch={val => onSearch && onSearch(val)}
             onChange={this.triggerChange}
           >
-            {
-              loading? <TreeNode key="noData" title={<Spin key="noData" size="small" />} value="noData" disabled />:
-                data && this.renderContent(data)
-            }
-
+            {loading ? (
+              <TreeNode
+                key="noData"
+                title={<Spin key="noData" size="small" />}
+                value="noData"
+                disabled
+              />
+            ) : (
+              data && this.renderContent(data)
+            )}
           </TreeSelect>
         </div>
         {showHandler && this.renderEditHandler(onEdit, value)}

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 
 import { Modal, Form, Input } from 'antd';
-import {connect} from "dva/index";
+import { connect } from 'dva/index';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -17,7 +17,7 @@ const { TextArea } = Input;
         value: formData.name,
       }),
       attrValues: Form.createFormField({
-        value: formData.attrValues? formData.attrValues.replace(/,/g, '\n'): null,
+        value: formData.attrValues ? formData.attrValues.replace(/,/g, '\n') : null,
       }),
     };
   },
@@ -26,7 +26,7 @@ export default class GoodsTypeForm extends PureComponent {
   focusTextInput = element => {
     // Focus the text input using the raw DOM API
     setTimeout(() => {
-      if (element.input) element.input.focus()
+      if (element.input) element.input.focus();
     }, 200);
   };
 
@@ -47,7 +47,10 @@ export default class GoodsTypeForm extends PureComponent {
         payload: {
           ...formData,
           ...fieldsValue,
-          attrValues: fieldsValue.attrValues.trim().replace(/\n+/g, '\n').replace(/\n/g, ','),
+          attrValues: fieldsValue.attrValues
+            .trim()
+            .replace(/\n+/g, '\n')
+            .replace(/\n/g, ','),
         },
       }).then(() => {
         handleAttrModalVisible();
@@ -57,11 +60,7 @@ export default class GoodsTypeForm extends PureComponent {
   };
 
   render() {
-    const {
-      modalVisible,
-      form: { getFieldDecorator },
-      handleAttrModalVisible,
-    } = this.props;
+    const { modalVisible, form: { getFieldDecorator }, handleAttrModalVisible } = this.props;
 
     const formItemLayout = {
       labelCol: {
@@ -90,7 +89,11 @@ export default class GoodsTypeForm extends PureComponent {
             ],
           })(<Input ref={this.focusTextInput} placeholder="给属性起个名字" />)}
         </FormItem>
-        <FormItem {...formItemLayout} label="可选值列表" help="从上面的列表中选择（一行代表一个可选值）">
+        <FormItem
+          {...formItemLayout}
+          label="可选值列表"
+          help="从上面的列表中选择（一行代表一个可选值）"
+        >
           {getFieldDecorator('attrValues', {
             rules: [
               {
@@ -98,12 +101,7 @@ export default class GoodsTypeForm extends PureComponent {
                 message: '请输入可选值列表',
               },
             ],
-          })(
-            <TextArea
-              style={{ minHeight: 32 }}
-              rows={6}
-            />
-          )}
+          })(<TextArea style={{ minHeight: 32 }} rows={6} />)}
         </FormItem>
       </Modal>
     );

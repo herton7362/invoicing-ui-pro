@@ -241,7 +241,7 @@ export default class Register extends Component {
             </InputGroup>
           </FormItem>
           <FormItem>
-            <Row gutter={8} style={{height: 43}}>
+            <Row gutter={8} style={{ height: 43 }}>
               <Col span={16}>
                 {getFieldDecorator('captcha', {
                   rules: [

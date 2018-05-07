@@ -2,7 +2,7 @@ import { stringify } from 'qs';
 import request from '../utils/request';
 
 export async function query({ currentPage = 1, pageSize = 15, ...rest } = {}) {
-  return request(`/api/goodsCategory?${stringify({currentPage, pageSize, ...rest})}`);
+  return request(`/api/goodsCategory?${stringify({ currentPage, pageSize, ...rest })}`);
 }
 
 export async function getOne({ id }) {

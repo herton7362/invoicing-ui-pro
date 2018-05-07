@@ -114,7 +114,7 @@ export default class BasicLayout extends React.PureComponent {
       type: 'user/fetchCurrent',
     });
   }
-  componentWillUnmount(){
+  componentWillUnmount() {
     unenquireScreen(this.enquireHandler);
   }
   getPageTitle() {
@@ -223,7 +223,7 @@ export default class BasicLayout extends React.PureComponent {
               {redirectData.map(item => (
                 <Redirect key={item.from} exact from={item.from} to={item.to} />
               ))}
-              {getRoutes(match.path, routerData).map((item) => (
+              {getRoutes(match.path, routerData).map(item => (
                 <AuthorizedRoute
                   key={item.key}
                   path={item.path}
