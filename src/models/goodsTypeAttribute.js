@@ -1,7 +1,7 @@
-import { getOne, save, remove } from '../services/goodsAttribute';
+import { getOne, save, remove } from '../services/goodsTypeAttribute';
 
 export default {
-  namespace: 'goodsAttribute',
+  namespace: 'goodsTypeAttribute',
 
   state: {
     formData: {},

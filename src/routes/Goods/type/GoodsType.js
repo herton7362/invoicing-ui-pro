@@ -11,10 +11,10 @@ import styles from './GoodsType.less';
 
 const { Search } = Input;
 
-@connect(({ goodsType, goodsAttribute, loading }) => ({
+@connect(({ goodsType, goodsTypeAttribute, loading }) => ({
   goodsType,
-  goodsAttribute,
-  loading: loading.models.goodsType || loading.models.goodsAttribute,
+  goodsTypeAttribute,
+  loading: loading.models.goodsType || loading.models.goodsTypeAttribute,
 }))
 export default class GoodsTypeList extends PureComponent {
   state = {
@@ -106,7 +106,7 @@ export default class GoodsTypeList extends PureComponent {
 
   handleOpenAddAttrModal = goodsTypeId => {
     this.props.dispatch({
-      type: 'goodsAttribute/getOne',
+      type: 'goodsTypeAttribute/getOne',
       payload: {
         goodsTypeId,
       },
@@ -116,7 +116,7 @@ export default class GoodsTypeList extends PureComponent {
 
   handleOpenEditAttrModal = id => {
     this.props.dispatch({
-      type: 'goodsAttribute/fetchOne',
+      type: 'goodsTypeAttribute/fetchOne',
       payload: { id },
     });
     this.handleAttrModalVisible(true);
@@ -124,7 +124,7 @@ export default class GoodsTypeList extends PureComponent {
 
   handleAttrRemove = id => {
     this.props.dispatch({
-      type: 'goodsAttribute/remove',
+      type: 'goodsTypeAttribute/remove',
       payload: {
         id,
       },
@@ -147,8 +147,8 @@ export default class GoodsTypeList extends PureComponent {
       {
         title: '属性',
         render: (val, record) =>
-          record.goodsAttributes && record.goodsAttributes.length > 0
-            ? record.goodsAttributes.map(attr => attr.name)
+          record.goodsTypeAttribute && record.goodsTypeAttribute.length > 0
+            ? record.goodsTypeAttribute.map(attr => attr.name)
             : '未配置',
       },
       {

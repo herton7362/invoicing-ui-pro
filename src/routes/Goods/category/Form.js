@@ -89,6 +89,7 @@ export default class GoodsCategoryForm extends PureComponent {
       <Modal
         title="商品分类维护"
         visible={modalVisible}
+        onCancel={onCancel}
         footer={[
           <Popconfirm key="delete" title="确定删除吗?" onConfirm={this.handleRemove}>
             <Button type="danger">删除</Button>

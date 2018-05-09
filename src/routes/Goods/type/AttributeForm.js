@@ -6,12 +6,12 @@ import { connect } from 'dva/index';
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
-@connect(({ goodsAttribute }) => ({
-  goodsAttribute,
+@connect(({ goodsTypeAttribute }) => ({
+  goodsTypeAttribute,
 }))
 @Form.create({
   mapPropsToFields(props) {
-    const { goodsAttribute: { formData } } = props;
+    const { goodsTypeAttribute: { formData } } = props;
     return {
       name: Form.createFormField({
         value: formData.name,
@@ -36,14 +36,14 @@ export default class GoodsTypeForm extends PureComponent {
       onSaveSuccess,
       handleAttrModalVisible,
       dispatch,
-      goodsAttribute: { formData },
+      goodsTypeAttribute: { formData },
     } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       form.resetFields();
       dispatch({
-        type: 'goodsAttribute/save',
+        type: 'goodsTypeAttribute/save',
         payload: {
           ...formData,
           ...fieldsValue,

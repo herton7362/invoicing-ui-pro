@@ -215,7 +215,11 @@ export default class GoodsForm extends PureComponent {
               </FormItem>
             </Card>
 
-            <Card style={{ marginTop: 24 }} bordered={false} title="其他信息">
+            <Card style={{ marginTop: 24 }} bordered={false} title="商品属性">
+
+            </Card>
+
+            <Card style={{ marginTop: 24 }} bordered={false} title="库存信息">
               <FormItem {...formItemLayout} label="重量">
                 {getFieldDecorator('weight')(
                   <InputNumber formatter={val => `kg ${numeral(val).format('0,0.0')}`} style={{ width: 200 }} placeholder="请输入商品的重量" />
