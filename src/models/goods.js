@@ -24,7 +24,11 @@ export default {
         payload: response,
       });
     },
-    *save({ payload, callback }, { call }) {
+    *save({ payload, callback }, { call, put }) {
+      yield put({
+        type: 'getOne',
+        payload,
+      });
       const response = yield call(save, payload);
       if (callback) callback(response);
     },

@@ -1,12 +1,13 @@
 import React, { PureComponent } from 'react';
 
 import { connect } from 'dva/index';
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input, Button, Popconfirm } from 'antd';
 
 const FormItem = Form.Item;
 
-@connect(({ goodsType }) => ({
+@connect(({ goodsType, loading }) => ({
   goodsType,
+  submitting: loading.effects['goodsType/save'],
 }))
 @Form.create({
   mapPropsToFields(props) {
@@ -26,7 +27,7 @@ export default class GoodsTypeForm extends PureComponent {
     }, 200);
   };
 
-  okHandle = () => {
+  handleOk = () => {
     const {
       form,
       onSaveSuccess,
@@ -34,10 +35,8 @@ export default class GoodsTypeForm extends PureComponent {
       dispatch,
       goodsType: { formData },
     } = this.props;
-
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      form.resetFields();
       dispatch({
         type: 'goodsType/save',
         payload: {
@@ -52,7 +51,7 @@ export default class GoodsTypeForm extends PureComponent {
   };
 
   render() {
-    const { modalVisible, form: { getFieldDecorator }, handleModalVisible } = this.props;
+    const { modalVisible, form: { getFieldDecorator }, handleModalVisible, onCancel, submitting } = this.props;
 
     const formItemLayout = {
       labelCol: {
@@ -70,6 +69,17 @@ export default class GoodsTypeForm extends PureComponent {
         visible={modalVisible}
         onOk={this.okHandle}
         onCancel={() => handleModalVisible()}
+        footer={[
+          <Popconfirm key="delete" title="确定删除吗?" onConfirm={this.handleRemove}>
+            <Button type="danger">删除</Button>
+          </Popconfirm>,
+          <Button key="cancel" onClick={() => onCancel()}>
+            取消
+          </Button>,
+          <Button key="submit" type="primary" loading={submitting} onClick={this.handleOk}>
+            保存
+          </Button>,
+        ]}
       >
         <FormItem {...formItemLayout} label="类别名称">
           {getFieldDecorator('name', {

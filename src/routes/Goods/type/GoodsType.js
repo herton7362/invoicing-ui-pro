@@ -181,6 +181,7 @@ export default class GoodsTypeList extends PureComponent {
       onSaveSuccess: this.onSaveSuccess,
       handleModalVisible: this.handleModalVisible,
       handleAttrModalVisible: this.handleAttrModalVisible,
+      onCancel: this.handleModalVisible,
     };
 
     return (

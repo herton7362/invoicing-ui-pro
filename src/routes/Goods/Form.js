@@ -8,6 +8,7 @@ import numeral from 'numeral';
 
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import CategorySelector from './category/CategorySelector';
+import GoodsTypeSelector from './type/GoodsTypeSelector';
 
 import styles from './Form.less';
 
@@ -46,6 +47,9 @@ const fieldLabels = {
       }),
       costPrice: Form.createFormField({
         value: formData.costPrice,
+      }),
+      goodsTypeId: Form.createFormField({
+        value: formData.goodsTypeId,
       }),
       weight: Form.createFormField({
         value: formData.weight,
@@ -216,7 +220,9 @@ export default class GoodsForm extends PureComponent {
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="商品属性">
-
+              <FormItem {...formItemLayout} label="商品类型">
+                {getFieldDecorator('goodsTypeId')(<GoodsTypeSelector style={{ width: 300 }} />)}
+              </FormItem>
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="库存信息">

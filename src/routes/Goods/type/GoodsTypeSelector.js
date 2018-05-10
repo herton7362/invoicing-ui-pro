@@ -4,13 +4,13 @@ import { connect } from 'dva/index';
 import { message } from 'antd';
 import debounce from 'lodash/debounce';
 import { TreeSelector } from 'components/DropdownSelector';
-import Form from './Form';
+import Form from './GoodsTypeForm';
 
-@connect(({ goodsCategory, loading }) => ({
-  goodsCategory,
-  loading: loading.models.goodsCategory,
+@connect(({ goodsType, loading }) => ({
+  goodsType,
+  loading: loading.models.goodsType,
 }))
-export default class CategorySelector extends Component {
+export default class GoodsTypeSelector extends Component {
   constructor() {
     super();
     this.handleSearch = debounce(this.handleSearch, 600);
@@ -55,7 +55,7 @@ export default class CategorySelector extends Component {
   handleSearch = name => {
     const { dispatch, value } = this.props;
     return dispatch({
-      type: 'goodsCategory/fetch',
+      type: 'goodsType/fetch',
       payload: {
         logicallyDeleted: 0,
         pageSize: 7,
@@ -72,18 +72,18 @@ export default class CategorySelector extends Component {
     });
   };
 
-  handleOpenGoodsCategoryAddModal = () => {
+  handleOpenGoodsTypeAddModal = () => {
     this.props.dispatch({
-      type: 'goodsCategory/getOne',
+      type: 'goodsType/getOne',
       payload: {},
     });
     this.handleModalVisible(true);
   };
 
-  handleOpenGoodsCategoryEditModal = id => {
+  handleOpenGoodsTypeEditModal = id => {
     this.props
       .dispatch({
-        type: 'goodsCategory/fetchOne',
+        type: 'goodsType/fetchOne',
         payload: { id },
       })
       .then(() => this.handleModalVisible(true));
@@ -94,7 +94,7 @@ export default class CategorySelector extends Component {
       dispatch,
       allowClear = false,
       showHandler = true,
-      goodsCategory: { data: { list } },
+      goodsType: { data: { list } },
       loading,
       ...rest
     } = this.props;
@@ -121,8 +121,8 @@ export default class CategorySelector extends Component {
           treeDefaultExpandAll
           dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
           onSearch={this.handleSearch}
-          onAdd={this.handleOpenGoodsCategoryAddModal}
-          onEdit={this.handleOpenGoodsCategoryEditModal}
+          onAdd={this.handleOpenGoodsTypeAddModal}
+          onEdit={this.handleOpenGoodsTypeEditModal}
           onChange={this.triggerChange}
         />
         <Form {...parentMethods} modalVisible={modalVisible} />
