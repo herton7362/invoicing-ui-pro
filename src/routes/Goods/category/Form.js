@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 
 import { connect } from 'dva/index';
 import { Modal, Form, Input, Button, Popconfirm } from 'antd';
+import AutoFocus from 'components/AutoFocus';
 import CategorySelector from './CategorySelector';
 
 const FormItem = Form.Item;
@@ -22,15 +23,17 @@ const FormItem = Form.Item;
       }),
     };
   },
+  onValuesChange(props, changedValues, allValues) {
+    const { dispatch, goodsCategory: { formData } } = props;
+    const payload = Object.assign(formData, allValues);
+
+    dispatch({
+      type: 'goodsCategory/saveForm',
+      payload,
+    });
+  },
 })
 export default class GoodsCategoryForm extends PureComponent {
-  focusTextInput = element => {
-    // Focus the text input using the raw DOM API
-    setTimeout(() => {
-      if (element.input) element.input.focus();
-    }, 200);
-  };
-
   handleOk = () => {
     const {
       form,
@@ -113,7 +116,11 @@ export default class GoodsCategoryForm extends PureComponent {
                 message: '请输入商品分类名称',
               },
             ],
-          })(<Input ref={this.focusTextInput} placeholder="给商品分类起个名字" />)}
+          })(
+            <AutoFocus focus={modalVisible}>
+              <Input placeholder="给商品分类起个名字" />
+            </AutoFocus>
+          )}
         </FormItem>
       </Modal>
     );

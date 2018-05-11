@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva/index';
 import { routerRedux } from 'dva/router';
-import { Card, Form, Button, Input, InputNumber, Popover, Icon  } from 'antd';
+import { Card, Form, Button, Input, InputNumber, Popover, Icon, Checkbox } from 'antd';
 import Pinyin from 'components/Pinyin';
 import FooterToolbar from 'components/FooterToolbar';
 import numeral from 'numeral';
@@ -14,21 +14,33 @@ import styles from './Form.less';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const CheckboxGroup = Checkbox.Group;
 
 const fieldLabels = {
   goodsCategoryId: '内部分类',
   name: '商品名称',
 };
 
-@connect(({ goods, goodsCategory, loading }) => ({
+@connect(({ goods, goodsCategory, goodsTypeAttribute, loading }) => ({
   goods,
   goodsCategory,
+  goodsTypeAttribute,
   fetchingGoodsCategory: loading.effects['goodsCategory/fetch'],
   submitting: loading.effects['goods/save'],
 }))
 @Form.create({
   mapPropsToFields(props) {
-    const { goods: { formData } } = props;
+    const { goods: { formData }, goodsTypeAttribute: { data: { list: attrs } } } = props;
+    const extra = {};
+
+    if (formData.attributes && attrs.length > 0) {
+      attrs.forEach(attr => {
+        extra[`attributes.${attr.id}`] = Form.createFormField({
+          value: formData.attributes[attr.id],
+        });
+      });
+    }
+
     return {
       goodsCategoryId: Form.createFormField({
         value: formData.goodsCategoryId,
@@ -63,7 +75,17 @@ const fieldLabels = {
       height: Form.createFormField({
         value: formData.height,
       }),
+      ...extra,
     };
+  },
+  onValuesChange(props, changedValues, allValues) {
+    const { dispatch, goods: { formData } } = props;
+    const payload = Object.assign(formData, allValues);
+
+    dispatch({
+      type: 'goods/saveForm',
+      payload,
+    });
   },
 })
 export default class GoodsForm extends PureComponent {
@@ -72,6 +94,8 @@ export default class GoodsForm extends PureComponent {
   };
 
   componentDidMount() {
+    const { goods: { formData } } = this.props;
+    if (formData.goodsTypeId) this.handleLoadAttributes(formData.goodsTypeId);
     window.addEventListener('resize', this.resizeFooterToolbar);
   }
 
@@ -102,6 +126,20 @@ export default class GoodsForm extends PureComponent {
     this.props.dispatch(routerRedux.push('/goods/list'));
   };
 
+  handleLoadAttributes = goodsTypeId => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'goodsTypeAttribute/fetch',
+      payload: {
+        goodsTypeId,
+        logicallyDeleted: 0,
+        sort: 'sortNumber',
+        order: 'asc',
+      },
+    });
+    return goodsTypeId;
+  };
+
   resizeFooterToolbar = () => {
     const sider = document.querySelectorAll('.ant-layout-sider')[0];
     const width = `calc(100% - ${sider.style.width})`;
@@ -111,12 +149,17 @@ export default class GoodsForm extends PureComponent {
   };
 
   render() {
-    const { submitting } = this.props;
+    const {
+      submitting,
+      goodsTypeAttribute: { data: { list: goodsTypeAttributeList } },
+    } = this.props;
     const { getFieldDecorator, setFieldsValue, getFieldsError } = this.props.form;
 
     const errors = getFieldsError();
+
     const getErrorInfo = () => {
-      const errorCount = Object.keys(errors).filter(key => errors[key]).length;
+      const errorCount = Object.keys(errors).filter(key => errors[key] && key !== 'attributes')
+        .length;
       if (!errors || errorCount === 0) {
         return null;
       }
@@ -214,36 +257,70 @@ export default class GoodsForm extends PureComponent {
               </FormItem>
               <FormItem {...formItemLayout} label="成本价">
                 {getFieldDecorator('costPrice')(
-                  <InputNumber formatter={val => `￥ ${numeral(val).format('0,0.0')}`} style={{ width: 200 }} placeholder="请输入商品的成本价" />
+                  <InputNumber
+                    formatter={val => `￥ ${numeral(val).format('0,0.0')}`}
+                    style={{ width: 200 }}
+                    placeholder="请输入商品的成本价"
+                  />
                 )}
               </FormItem>
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="商品属性">
               <FormItem {...formItemLayout} label="商品类型">
-                {getFieldDecorator('goodsTypeId')(<GoodsTypeSelector style={{ width: 300 }} />)}
+                {getFieldDecorator('goodsTypeId', {
+                  getValueFromEvent: this.handleLoadAttributes,
+                })(<GoodsTypeSelector style={{ width: 300 }} />)}
               </FormItem>
+              {goodsTypeAttributeList.length > 0 &&
+                goodsTypeAttributeList.map(attr => (
+                  <FormItem key={attr.id} {...formItemLayout} label={attr.name}>
+                    {getFieldDecorator(`attributes.${attr.id}`)(
+                      <CheckboxGroup
+                        options={attr.attrValues
+                          .split(',')
+                          .map(val => ({ label: val, value: val }))}
+                      />
+                    )}
+                  </FormItem>
+                ))}
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="库存信息">
               <FormItem {...formItemLayout} label="重量">
                 {getFieldDecorator('weight')(
-                  <InputNumber formatter={val => `kg ${numeral(val).format('0,0.0')}`} style={{ width: 200 }} placeholder="请输入商品的重量" />
+                  <InputNumber
+                    formatter={val => `kg ${numeral(val).format('0,0.0')}`}
+                    style={{ width: 200 }}
+                    placeholder="请输入商品的重量"
+                  />
                 )}
               </FormItem>
               <FormItem {...formItemLayout} label="长度">
                 {getFieldDecorator('length')(
-                  <InputNumber formatter={val => `cm ${numeral(val).format('0,0.0')}`} style={{ width: 200 }} placeholder="请输入商品的长度" />
+                  <InputNumber
+                    formatter={val => `cm ${numeral(val).format('0,0.0')}`}
+                    style={{ width: 200 }}
+                    placeholder="请输入商品的长度"
+                  />
                 )}
               </FormItem>
               <FormItem {...formItemLayout} label="宽度">
                 {getFieldDecorator('width')(
-                  <InputNumber formatter={val => `cm ${numeral(val).format('0,0.0')}`} style={{ width: 200 }} placeholder="请输入商品的宽度" />
+                  <InputNumber
+                    formatter={val => `cm ${numeral(val).format('0,0.0')}`}
+                    style={{ width: 200 }}
+                    placeholder="请输入商品的宽度"
+                  />
                 )}
               </FormItem>
               <FormItem {...formItemLayout} label="高度">
                 {getFieldDecorator('height')(
-                  <InputNumber formatter={val => `cm ${numeral(val).format('0,0.0')}`} style={{ width: 200 }} placeholder="请输入商品的高度" />
+                  <InputNumber
+                    formatter={val => `cm ${numeral(val).format('0,0.0')}`}
+                    style={{ width: 200 }}
+                    placeholder="请输入商品的高度"
+                  />
                 )}
               </FormItem>
             </Card>

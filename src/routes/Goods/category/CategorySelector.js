@@ -74,7 +74,7 @@ export default class CategorySelector extends Component {
 
   handleOpenGoodsCategoryAddModal = () => {
     this.props.dispatch({
-      type: 'goodsCategory/getOne',
+      type: 'goodsCategory/saveForm',
       payload: {},
     });
     this.handleModalVisible(true);

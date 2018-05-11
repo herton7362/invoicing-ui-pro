@@ -90,7 +90,7 @@ export default class GoodsTypeList extends PureComponent {
 
   handleOpenAddModal = () => {
     this.props.dispatch({
-      type: 'goodsType/getOne',
+      type: 'goodsType/saveForm',
       payload: {},
     });
     this.handleModalVisible(true);
@@ -106,7 +106,7 @@ export default class GoodsTypeList extends PureComponent {
 
   handleOpenAddAttrModal = goodsTypeId => {
     this.props.dispatch({
-      type: 'goodsTypeAttribute/getOne',
+      type: 'goodsTypeAttribute/saveForm',
       payload: {
         goodsTypeId,
       },
@@ -115,11 +115,12 @@ export default class GoodsTypeList extends PureComponent {
   };
 
   handleOpenEditAttrModal = id => {
-    this.props.dispatch({
-      type: 'goodsTypeAttribute/fetchOne',
-      payload: { id },
-    });
-    this.handleAttrModalVisible(true);
+    this.props
+      .dispatch({
+        type: 'goodsTypeAttribute/fetchOne',
+        payload: { id },
+      })
+      .then(() => this.handleAttrModalVisible(true));
   };
 
   handleAttrRemove = id => {
@@ -147,9 +148,9 @@ export default class GoodsTypeList extends PureComponent {
       {
         title: '属性',
         render: (val, record) =>
-          record.goodsTypeAttribute && record.goodsTypeAttribute.length > 0
-            ? record.goodsTypeAttribute.map(attr => attr.name)
-            : '未配置',
+          record.goodsTypeAttributes && record.goodsTypeAttributes.length > 0
+            ? record.goodsTypeAttributes.map(attr => attr.name).join('，')
+            : '---',
       },
       {
         title: '操作',

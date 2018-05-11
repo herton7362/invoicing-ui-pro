@@ -42,7 +42,11 @@ class TreeSelector extends Component {
   renderEditHandler = (onEdit, value) => {
     return (
       <div className={styles.editHandlerWrapper}>
-        <a className={styles.editHandler} onClick={() => onEdit(value)}>
+        <a
+          style={{ display: value ? 'inline-block' : 'none' }}
+          className={styles.editHandler}
+          onClick={() => onEdit(value)}
+        >
           <Icon type="edit" />
         </a>
       </div>

@@ -6,7 +6,7 @@ import styles from './Selector.less';
 
 const { Option } = Select;
 
-class TreeSelector extends Component {
+class Selector extends Component {
   state = {
     value: null,
   };
@@ -31,46 +31,34 @@ class TreeSelector extends Component {
   };
   renderAddMoreHandler = () => {
     return (
-      <Option
-        className={styles.addHandlerWrapper}
-        title={<a className={styles.addHandler}>添加一个...</a>}
-        key="add"
-        value="_add"
-      />
+      <Option key="add" value="_add">
+        <a>添加一个...</a>
+      </Option>
     );
   };
   renderEditHandler = (onEdit, value) => {
     return (
       <div className={styles.editHandlerWrapper}>
-        <a className={styles.editHandler} onClick={() => onEdit(value)}>
+        <a
+          style={{ display: value ? 'inline-block' : 'none' }}
+          className={styles.editHandler}
+          onClick={() => onEdit(value)}
+        >
           <Icon type="edit" />
         </a>
       </div>
     );
   };
-  renderTreeData = (list, parentId = null) => {
-    return list
-      .map(item => {
-        if (
-          item.parentId === parentId ||
-          (!list.some(i => i.id === item.parentId) && parentId === null)
-        ) {
-          const children = this.renderTreeData(list, item.id);
-          return (
-            <Option value={item.id} title={item.name} key={item.id}>
-              {children.length > 0 && children}
-            </Option>
-          );
-        }
-        return null;
-      })
-      .filter(item => item);
+  renderOptions = list => {
+    return list.map(item => (
+      <Option value={item.id} key={item.id}>
+        {item.name}
+      </Option>
+    ));
   };
   renderContent = data => {
     const { showHandler } = this.props;
-    return [this.renderTreeData(data), showHandler && this.renderAddMoreHandler()].filter(
-      item => item
-    );
+    return [this.renderOptions(data), showHandler && this.renderAddMoreHandler()];
   };
   render() {
     const {
@@ -79,9 +67,7 @@ class TreeSelector extends Component {
       placeholder,
       allowClear,
       dropdownStyle,
-      treeDefaultExpandAll,
-      treeNodeFilterProp = 'title',
-      filterTreeNode = false,
+      optionFilterProp = 'children',
       loading = false,
       showHandler = true,
       onSearch,
@@ -93,7 +79,7 @@ class TreeSelector extends Component {
     const { value } = this.state;
 
     return (
-      <div className={styles.treeSelector} {...rest}>
+      <div className={styles.selector} {...rest}>
         <div className={styles.field}>
           <Select
             value={loading ? 'noData' : value}
@@ -101,19 +87,14 @@ class TreeSelector extends Component {
             placeholder={placeholder}
             allowClear={allowClear}
             dropdownStyle={dropdownStyle}
-            treeDefaultExpandAll={treeDefaultExpandAll}
-            treeNodeFilterProp={treeNodeFilterProp}
-            filterTreeNode={filterTreeNode}
+            optionFilterProp={optionFilterProp}
             onSearch={val => onSearch && onSearch(val)}
             onChange={this.triggerChange}
           >
             {loading ? (
-              <Option
-                key="noData"
-                title={<Spin key="noData" size="small" />}
-                value="noData"
-                disabled
-              />
+              <Option key="noData" value="noData" disabled>
+                <Spin key="noData" size="small" />
+              </Option>
             ) : (
               data && this.renderContent(data)
             )}
@@ -125,4 +106,4 @@ class TreeSelector extends Component {
   }
 }
 
-export default TreeSelector;
+export default Selector;

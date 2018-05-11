@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import firstletter from './pinyinFirstletter';
-
-export default class Pinyin extends Component {
+export default class AutoFocus extends Component {
   static defaultProps = {
-    onPinyinChange: () => {},
+    focus: false,
   };
 
   static propTypes = {
     children: PropTypes.object.isRequired,
-    onPinyinChange: PropTypes.func,
+    focus: PropTypes.bool,
   };
 
   constructor(props) {
@@ -18,11 +16,15 @@ export default class Pinyin extends Component {
 
     this.state = {
       value: props.value,
+      focus: props.focus,
     };
+
+    if (props.focus) this.focusTextInput();
   }
 
   state = {
     value: null,
+    focus: false,
   };
 
   componentWillReceiveProps(nextProps) {
@@ -30,40 +32,39 @@ export default class Pinyin extends Component {
       const { value } = nextProps;
       this.setState({ value });
     }
+    if ('focus' in nextProps) {
+      const { focus } = nextProps;
+      if (focus) if (!this.state.focus) this.focusTextInput();
+      this.setState({ focus });
+    }
   }
 
-  getFirstPinyinLetter = string => {
-    if (!string || /^ +$/g.test(string)) return '';
-    const result = [];
-    for (const [ch] of string) {
-      const unicode = ch.charCodeAt(0);
-      if (unicode >= 19968 && unicode <= 40869) {
-        result.push(firstletter.all.charAt(unicode - 19968));
-      } else {
-        result.push(ch);
-      }
-    }
-    return result.join('').toLowerCase();
+  focusTextInput = () => {
+    setTimeout(() => {
+      if (this.input) this.input.focus();
+    }, 200);
   };
 
   triggerChange = changedValue => {
-    const { onChange, onPinyinChange } = this.props;
+    const { onChange } = this.props;
     if (!('value' in this.props)) {
       this.setState({ value: changedValue });
     }
     if (onChange) {
       onChange(changedValue);
     }
-    onPinyinChange(this.getFirstPinyinLetter(changedValue.target.value));
   };
 
   render() {
-    const { children, onPinyinChange, ...restProps } = this.props;
+    const { children, focus, ...restProps } = this.props;
     const { value } = this.state;
 
     return (
       <div {...restProps}>
         {React.cloneElement(children, {
+          ref: element => {
+            this.input = element && element.input;
+          },
           value,
           onChange: this.triggerChange,
         })}

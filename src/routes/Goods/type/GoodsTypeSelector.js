@@ -3,7 +3,7 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'dva/index';
 import { message } from 'antd';
 import debounce from 'lodash/debounce';
-import { TreeSelector } from 'components/DropdownSelector';
+import { Selector } from 'components/DropdownSelector';
 import Form from './GoodsTypeForm';
 
 @connect(({ goodsType, loading }) => ({
@@ -74,7 +74,7 @@ export default class GoodsTypeSelector extends Component {
 
   handleOpenGoodsTypeAddModal = () => {
     this.props.dispatch({
-      type: 'goodsType/getOne',
+      type: 'goodsType/saveForm',
       payload: {},
     });
     this.handleModalVisible(true);
@@ -92,7 +92,7 @@ export default class GoodsTypeSelector extends Component {
   render() {
     const {
       dispatch,
-      allowClear = false,
+      allowClear = true,
       showHandler = true,
       goodsType: { data: { list } },
       loading,
@@ -108,7 +108,7 @@ export default class GoodsTypeSelector extends Component {
 
     return (
       <Fragment>
-        <TreeSelector
+        <Selector
           {...rest}
           value={value}
           showSearch
@@ -117,8 +117,6 @@ export default class GoodsTypeSelector extends Component {
           loading={loading}
           data={list}
           placeholder="请选择一个商品分类"
-          filterTreeNode={false}
-          treeDefaultExpandAll
           dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
           onSearch={this.handleSearch}
           onAdd={this.handleOpenGoodsTypeAddModal}

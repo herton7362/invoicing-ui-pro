@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 
-import { Modal, Form, Input } from 'antd';
 import { connect } from 'dva/index';
+import { Modal, Form, Input } from 'antd';
+import AutoFocus from 'components/AutoFocus';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -21,15 +22,17 @@ const { TextArea } = Input;
       }),
     };
   },
+  onValuesChange(props, changedValues, allValues) {
+    const { dispatch, goodsTypeAttribute: { formData } } = props;
+    const payload = Object.assign(formData, allValues);
+
+    dispatch({
+      type: 'goodsTypeAttribute/saveForm',
+      payload,
+    });
+  },
 })
 export default class GoodsTypeForm extends PureComponent {
-  focusTextInput = element => {
-    // Focus the text input using the raw DOM API
-    setTimeout(() => {
-      if (element.input) element.input.focus();
-    }, 200);
-  };
-
   okHandle = () => {
     const {
       form,
@@ -87,7 +90,11 @@ export default class GoodsTypeForm extends PureComponent {
                 message: '请输入属性名称',
               },
             ],
-          })(<Input ref={this.focusTextInput} placeholder="给属性起个名字" />)}
+          })(
+            <AutoFocus focus={modalVisible}>
+              <Input placeholder="给属性起个名字" />
+            </AutoFocus>
+          )}
         </FormItem>
         <FormItem
           {...formItemLayout}

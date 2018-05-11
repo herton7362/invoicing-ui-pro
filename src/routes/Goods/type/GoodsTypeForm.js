@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 
 import { connect } from 'dva/index';
 import { Modal, Form, Input, Button, Popconfirm } from 'antd';
+import AutoFocus from 'components/AutoFocus';
 
 const FormItem = Form.Item;
 
@@ -12,21 +13,24 @@ const FormItem = Form.Item;
 @Form.create({
   mapPropsToFields(props) {
     const { goodsType: { formData } } = props;
+
     return {
       name: Form.createFormField({
         value: formData.name,
       }),
     };
   },
+  onValuesChange(props, changedValues, allValues) {
+    const { dispatch, goodsType: { formData } } = props;
+    const payload = Object.assign(formData, allValues);
+
+    dispatch({
+      type: 'goodsType/saveForm',
+      payload,
+    });
+  },
 })
 export default class GoodsTypeForm extends PureComponent {
-  focusTextInput = element => {
-    // Focus the text input using the raw DOM API
-    setTimeout(() => {
-      if (element.input) element.input.focus();
-    }, 200);
-  };
-
   handleOk = () => {
     const {
       form,
@@ -51,7 +55,13 @@ export default class GoodsTypeForm extends PureComponent {
   };
 
   render() {
-    const { modalVisible, form: { getFieldDecorator }, handleModalVisible, onCancel, submitting } = this.props;
+    const {
+      modalVisible,
+      form: { getFieldDecorator },
+      handleModalVisible,
+      onCancel,
+      submitting,
+    } = this.props;
 
     const formItemLayout = {
       labelCol: {
@@ -89,7 +99,11 @@ export default class GoodsTypeForm extends PureComponent {
                 message: '请输入商品类别名称',
               },
             ],
-          })(<Input ref={this.focusTextInput} placeholder="给商品类别起个名字" />)}
+          })(
+            <AutoFocus focus={modalVisible}>
+              <Input placeholder="给商品类别起个名字" />
+            </AutoFocus>
+          )}
         </FormItem>
       </Modal>
     );

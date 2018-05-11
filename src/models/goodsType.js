@@ -22,15 +22,11 @@ export default {
     *fetchOne({ payload }, { call, put }) {
       const response = yield call(getOne, payload);
       yield put({
-        type: 'getOne',
+        type: 'saveForm',
         payload: response,
       });
     },
-    *save({ payload, callback }, { call, put }) {
-      yield put({
-        type: 'getOne',
-        payload,
-      });
+    *save({ payload, callback }, { call }) {
       yield call(save, payload);
       if (callback) callback();
     },
@@ -52,7 +48,7 @@ export default {
         },
       };
     },
-    getOne(state, action) {
+    saveForm(state, action) {
       return {
         ...state,
         formData: action.payload || {},

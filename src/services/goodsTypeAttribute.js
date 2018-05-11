@@ -1,4 +1,9 @@
+import { stringify } from 'qs';
 import request from '../utils/request';
+
+export async function query({ currentPage = 1, pageSize = 15, ...rest } = {}) {
+  return request(`/api/goodsTypeAttribute?${stringify({ currentPage, pageSize, ...rest })}`);
+}
 
 export async function getOne({ id }) {
   return request(`/api/goodsTypeAttribute/${id}`);

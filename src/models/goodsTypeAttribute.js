@@ -1,25 +1,32 @@
-import { getOne, save, remove } from '../services/goodsTypeAttribute';
+import { query, getOne, save, remove } from '../services/goodsTypeAttribute';
 
 export default {
   namespace: 'goodsTypeAttribute',
 
   state: {
+    data: {
+      list: [],
+      pagination: {},
+    },
     formData: {},
   },
 
   effects: {
-    *fetchOne({ payload }, { call, put }) {
-      const response = yield call(getOne, payload);
+    *fetch({ payload }, { call, put }) {
+      const response = yield call(query, payload);
       yield put({
-        type: 'getOne',
+        type: 'queryList',
         payload: response,
       });
     },
-    *save({ payload, callback }, { call, put }) {
+    *fetchOne({ payload }, { call, put }) {
+      const response = yield call(getOne, payload);
       yield put({
-        type: 'getOne',
-        payload,
+        type: 'saveForm',
+        payload: response,
       });
+    },
+    *save({ payload, callback }, { call }) {
       yield call(save, payload);
       if (callback) callback();
     },
@@ -30,7 +37,18 @@ export default {
   },
 
   reducers: {
-    getOne(state, action) {
+    queryList(state, action) {
+      return {
+        ...state,
+        data: {
+          list: Array.isArray(action.payload.content) ? action.payload.content : [],
+          pagination: {
+            total: action.payload.totalElements,
+          },
+        },
+      };
+    },
+    saveForm(state, action) {
       return {
         ...state,
         formData: action.payload || {},
