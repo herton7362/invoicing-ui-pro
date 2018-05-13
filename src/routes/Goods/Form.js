@@ -273,71 +273,72 @@ export default class GoodsForm extends PureComponent {
         result[item.goodsTypeAttributeId] = result[item.goodsTypeAttributeId] || [];
         result[item.goodsTypeAttributeId].push(item.goodsTypeAttributeValue);
       });
-      let skuLength = 1;
-      const carry = {};
+      const aa = [];
       Object.keys(result).forEach(key => {
-        skuLength *= result[key].length;
-        carry[key] = 0;
+        aa.push(result[key].length);
       });
-      let r = [];
-      let row = [];
-      for(let i = 0; i < skuLength; i += 1) {
-        row = [];
-        Object.keys(result).forEach(key => {
-          row.push(result[key][carry[key]]);
-        });
-        if(carry[key] === result[key].length - 1) {
-          carry[key] = 0;
-        } else {
-          carry[key] = carry[key] + 1;
-        }
-        r.push(row);
-      }
 
-      const MyArray = (props)=> {
-        const carry = [];
-        let currentIndex = 0;
+      const MyMatrix = (props) => {
+        const length = props.reduce((x,y) => x * y);
+        const matrix = new Array(length).fill([]);
+        const row = MyArray(props);
+        return matrix.map(() => row.next());
+      };
+
+      const MyArray = (props) => {
+        const numbers = [];
         props.forEach(p => {
-          carry.push(MyNumber(0));
+          numbers.push(new MyNumber(p));
         });
 
-        return {
-          next: (currentIndex = 0) => {
-            if(carry[currentIndex].next()) {
-              if(currentIndex >= props.length - 1) {
-                currentIndex = 0;
-              } else {
-                currentIndex = currentIndex + 1;
-              }
-              next(currentIndex)
+        const isLast = (index) => {
+          return index >= props.length - 1;
+        };
+
+        const next = (index = 0) => {
+          if(numbers[index].next()) {
+            if(isLast(index)) {
+              next();
+            } else {
+              next(index + 1);
             }
           }
-        }
-      }
+        };
 
-      const MyNumber = (length)=> {
+        return {
+          next: () => {
+            const result = numbers.map(num => num.get());
+            next();
+            return result;
+          },
+        };
+      };
+
+      const MyNumber = (length) => {
         let num = 0;
+
+        const isLast = () => {
+          return num >= length - 1;
+        };
+
         return {
           next: () => {
             if(isLast()) {
               num = 0;
-              return false;
-            } else {
-              num = num + 1;
               return true;
+            } else {
+              num += 1;
+              return false;
             }
           },
-          isLast: () => {
-            return num >= length - 1;
-          }
+          get: () => num,
         }
-      }
+      };
 
-      MyArray([2, 3, 4])
+      if(aa.length > 1)
+        console.log(MyMatrix(aa));
 
-
-      console.log(r)
-    }
+    };
 
     return (
       <PageHeaderLayout>
