@@ -27,6 +27,11 @@ export default (record, handleOpenEditAttrModal, handleAttrRemove) => {
   ];
 
   return (
-    <Table rowKey="id" columns={columns} dataSource={record.goodsTypeAttributes} pagination={false} />
+    <Table
+      rowKey="id"
+      columns={columns}
+      dataSource={record.goodsTypeAttributes}
+      pagination={false}
+    />
   );
 };

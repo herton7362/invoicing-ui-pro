@@ -14,7 +14,6 @@ import styles from './Form.less';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
-const CheckboxGroup = Checkbox.Group;
 
 const fieldLabels = {
   goodsCategoryId: '内部分类',
@@ -30,16 +29,19 @@ const fieldLabels = {
 }))
 @Form.create({
   mapPropsToFields(props) {
-    const { goods: { formData }, goodsTypeAttribute: { data: { list: attrs } } } = props;
+    const { goods: { formData: { goodsAttributes }, formData } } = props;
     const extra = {};
 
-    if (formData.attributes && attrs.length > 0) {
-      attrs.forEach(attr => {
-        extra[`attributes.${attr.id}`] = Form.createFormField({
-          value: formData.attributes[attr.id],
-        });
-      });
-    }
+    if(goodsAttributes)
+      goodsAttributes.forEach((attr, index) => {
+        if(attr)
+          extra[`goodsAttributes[${index}]`] = Form.createFormField({
+            value: {
+              goodsTypeAttributeValue: attr.goodsTypeAttributeValue,
+              goodsTypeAttributeId: attr.goodsTypeAttributeId,
+            },
+          });
+      })
 
     return {
       goodsCategoryId: Form.createFormField({
@@ -58,22 +60,25 @@ const fieldLabels = {
         value: formData.remark,
       }),
       costPrice: Form.createFormField({
-        value: formData.costPrice,
+        value: formData.costPrice || 0,
+      }),
+      stockNumber: Form.createFormField({
+        value: formData.stockNumber || 0,
       }),
       goodsTypeId: Form.createFormField({
         value: formData.goodsTypeId,
       }),
       weight: Form.createFormField({
-        value: formData.weight,
+        value: formData.weight || 0,
       }),
       length: Form.createFormField({
-        value: formData.length,
+        value: formData.length || 0,
       }),
       width: Form.createFormField({
-        value: formData.width,
+        value: formData.width || 0,
       }),
       height: Form.createFormField({
-        value: formData.height,
+        value: formData.height || 0,
       }),
       ...extra,
     };
@@ -128,15 +133,22 @@ export default class GoodsForm extends PureComponent {
 
   handleLoadAttributes = goodsTypeId => {
     const { dispatch } = this.props;
-    dispatch({
-      type: 'goodsTypeAttribute/fetch',
-      payload: {
-        goodsTypeId,
-        logicallyDeleted: 0,
-        sort: 'sortNumber',
-        order: 'asc',
-      },
-    });
+    if(goodsTypeId) {
+      dispatch({
+        type: 'goodsTypeAttribute/fetch',
+        payload: {
+          goodsTypeId,
+          logicallyDeleted: 0,
+          sort: 'sortNumber',
+          order: 'asc',
+        },
+      });
+    } else {
+      dispatch({
+        type: 'goodsTypeAttribute/queryList',
+        payload: {},
+      });
+    }
     return goodsTypeId;
   };
 
@@ -151,14 +163,16 @@ export default class GoodsForm extends PureComponent {
   render() {
     const {
       submitting,
+      goods: { formData },
       goodsTypeAttribute: { data: { list: goodsTypeAttributeList } },
     } = this.props;
-    const { getFieldDecorator, setFieldsValue, getFieldsError } = this.props.form;
+    const { getFieldDecorator, setFieldsValue, getFieldValue, getFieldsError } = this.props.form;
 
     const errors = getFieldsError();
 
     const getErrorInfo = () => {
-      const errorCount = Object.keys(errors).filter(key => errors[key] && key !== 'attributes')
+      const excludeKey = ['goodsAttributes'];
+      const errorCount = Object.keys(errors).filter(key => errors[key] && !excludeKey.includes(key))
         .length;
       if (!errors || errorCount === 0) {
         return null;
@@ -170,7 +184,7 @@ export default class GoodsForm extends PureComponent {
         }
       };
       const errorList = Object.keys(errors).map(key => {
-        if (!errors[key]) {
+        if (!errors[key] || excludeKey.includes(key)) {
           return null;
         }
         return (
@@ -208,6 +222,122 @@ export default class GoodsForm extends PureComponent {
         md: { span: 10 },
       },
     };
+
+    const renderGoodsAttributes = (attrs) => {
+      const isChecked = (key, value) => {
+        return getFieldValue(key)
+          && value.val === getFieldValue(key).goodsTypeAttributeValue
+          && value.attrId === getFieldValue(key).goodsTypeAttributeId;
+      }
+      const setValue = (checked, key, value) => {
+        if(checked) {
+          setFieldsValue({
+            [key]: {
+              goodsTypeAttributeValue: value.val,
+              goodsTypeAttributeId: value.attrId,
+            },
+          });
+        } else {
+          setFieldsValue({[key]: null});
+        }
+      }
+      return attrs.map((attr, attrIndex) => (
+        <FormItem key={attr.id} {...formItemLayout} label={attr.name}>
+          {
+            attr.attrValues
+              .split(',')
+              .map((val, vaIndex) => {
+                let lastAttrValuesLength = 0;
+                if(attrIndex > 0) {
+                  lastAttrValuesLength = goodsTypeAttributeList[attrIndex - 1].attrValues.split(',').length;
+                }
+                const key = `goodsAttributes[${lastAttrValuesLength + vaIndex}]`;
+                return (
+                  <Checkbox
+                    key={`${attr.id}_${val}`}
+                    checked={isChecked(key, {val, attrId: attr.id})}
+                    onChange={e => setValue(e.target.checked, key, {val, attrId: attr.id})}
+                  >
+                    { val }
+                  </Checkbox>
+                )
+              })}
+        </FormItem>
+      ))
+    }
+
+    const test = () => {
+      const a = formData.goodsAttributes && formData.goodsAttributes.filter(v=>v);
+      const result = {};
+      a && a.forEach(item => {
+        result[item.goodsTypeAttributeId] = result[item.goodsTypeAttributeId] || [];
+        result[item.goodsTypeAttributeId].push(item.goodsTypeAttributeValue);
+      });
+      let skuLength = 1;
+      const carry = {};
+      Object.keys(result).forEach(key => {
+        skuLength *= result[key].length;
+        carry[key] = 0;
+      });
+      let r = [];
+      let row = [];
+      for(let i = 0; i < skuLength; i += 1) {
+        row = [];
+        Object.keys(result).forEach(key => {
+          row.push(result[key][carry[key]]);
+        });
+        if(carry[key] === result[key].length - 1) {
+          carry[key] = 0;
+        } else {
+          carry[key] = carry[key] + 1;
+        }
+        r.push(row);
+      }
+
+      const MyArray = (props)=> {
+        const carry = [];
+        let currentIndex = 0;
+        props.forEach(p => {
+          carry.push(MyNumber(0));
+        });
+
+        return {
+          next: (currentIndex = 0) => {
+            if(carry[currentIndex].next()) {
+              if(currentIndex >= props.length - 1) {
+                currentIndex = 0;
+              } else {
+                currentIndex = currentIndex + 1;
+              }
+              next(currentIndex)
+            }
+          }
+        }
+      }
+
+      const MyNumber = (length)=> {
+        let num = 0;
+        return {
+          next: () => {
+            if(isLast()) {
+              num = 0;
+              return false;
+            } else {
+              num = num + 1;
+              return true;
+            }
+          },
+          isLast: () => {
+            return num >= length - 1;
+          }
+        }
+      }
+
+      MyArray([2, 3, 4])
+
+
+      console.log(r)
+    }
 
     return (
       <PageHeaderLayout>
@@ -264,6 +394,14 @@ export default class GoodsForm extends PureComponent {
                   />
                 )}
               </FormItem>
+              <FormItem {...formItemLayout} label="库存数量" extra="如果没有sku则以当前数量为准">
+                {getFieldDecorator('stockNumber')(
+                  <InputNumber
+                    style={{ width: 200 }}
+                    placeholder="请输入商品的库存数量"
+                  />
+                )}
+              </FormItem>
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="商品属性">
@@ -272,18 +410,10 @@ export default class GoodsForm extends PureComponent {
                   getValueFromEvent: this.handleLoadAttributes,
                 })(<GoodsTypeSelector style={{ width: 300 }} />)}
               </FormItem>
-              {goodsTypeAttributeList.length > 0 &&
-                goodsTypeAttributeList.map(attr => (
-                  <FormItem key={attr.id} {...formItemLayout} label={attr.name}>
-                    {getFieldDecorator(`attributes.${attr.id}`)(
-                      <CheckboxGroup
-                        options={attr.attrValues
-                          .split(',')
-                          .map(val => ({ label: val, value: val }))}
-                      />
-                    )}
-                  </FormItem>
-                ))}
+              {goodsTypeAttributeList.length > 0 && renderGoodsAttributes(goodsTypeAttributeList)}
+              {
+                test()
+              }
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="库存信息">
