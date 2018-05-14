@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import { Table } from 'antd';
+
 export default class GoodsSkus extends Component {
   state = {
     value: null,
@@ -90,8 +92,30 @@ export default class GoodsSkus extends Component {
   };
 
   render() {
+    const { goodsTypeAttributes } = this.props;
     const { value } = this.state;
+    const columns = [
+      {
+        title: '条码',
+        dataIndex: 'barcode',
+      },
+      {
+        title: '进货价',
+        dataIndex: 'lastPurchasePrice',
+      },
+      {
+        title: '库存数量',
+        dataIndex: 'stockNumber',
+      },
+    ];
 
-    return <div />;
+    columns.unshift(goodsTypeAttributes.map(attr => ({
+      title: attr.name,
+      dataIndex: attr.id,
+    })));
+
+    return (
+      <Table columns={columns} dataSource={value} />
+    );
   }
 }
