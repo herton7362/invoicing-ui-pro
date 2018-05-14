@@ -32,16 +32,16 @@ const fieldLabels = {
     const { goods: { formData: { goodsAttributes }, formData } } = props;
     const extra = {};
 
-    if(goodsAttributes)
+    if (goodsAttributes)
       goodsAttributes.forEach((attr, index) => {
-        if(attr)
+        if (attr)
           extra[`goodsAttributes[${index}]`] = Form.createFormField({
             value: {
               goodsTypeAttributeValue: attr.goodsTypeAttributeValue,
               goodsTypeAttributeId: attr.goodsTypeAttributeId,
             },
           });
-      })
+      });
 
     return {
       goodsCategoryId: Form.createFormField({
@@ -133,7 +133,7 @@ export default class GoodsForm extends PureComponent {
 
   handleLoadAttributes = goodsTypeId => {
     const { dispatch } = this.props;
-    if(goodsTypeId) {
+    if (goodsTypeId) {
       dispatch({
         type: 'goodsTypeAttribute/fetch',
         payload: {
@@ -223,14 +223,16 @@ export default class GoodsForm extends PureComponent {
       },
     };
 
-    const renderGoodsAttributes = (attrs) => {
+    const renderGoodsAttributes = attrs => {
       const isChecked = (key, value) => {
-        return getFieldValue(key)
-          && value.val === getFieldValue(key).goodsTypeAttributeValue
-          && value.attrId === getFieldValue(key).goodsTypeAttributeId;
-      }
+        return (
+          getFieldValue(key) &&
+          value.val === getFieldValue(key).goodsTypeAttributeValue &&
+          value.attrId === getFieldValue(key).goodsTypeAttributeId
+        );
+      };
       const setValue = (checked, key, value) => {
-        if(checked) {
+        if (checked) {
           setFieldsValue({
             [key]: {
               goodsTypeAttributeValue: value.val,
@@ -238,106 +240,47 @@ export default class GoodsForm extends PureComponent {
             },
           });
         } else {
-          setFieldsValue({[key]: null});
+          setFieldsValue({ [key]: null });
         }
-      }
+      };
       return attrs.map((attr, attrIndex) => (
         <FormItem key={attr.id} {...formItemLayout} label={attr.name}>
-          {
-            attr.attrValues
-              .split(',')
-              .map((val, vaIndex) => {
-                let lastAttrValuesLength = 0;
-                if(attrIndex > 0) {
-                  lastAttrValuesLength = goodsTypeAttributeList[attrIndex - 1].attrValues.split(',').length;
-                }
-                const key = `goodsAttributes[${lastAttrValuesLength + vaIndex}]`;
-                return (
-                  <Checkbox
-                    key={`${attr.id}_${val}`}
-                    checked={isChecked(key, {val, attrId: attr.id})}
-                    onChange={e => setValue(e.target.checked, key, {val, attrId: attr.id})}
-                  >
-                    { val }
-                  </Checkbox>
-                )
-              })}
+          {attr.attrValues.split(',').map((val, vaIndex) => {
+            let lastAttrValuesLength = 0;
+            if (attrIndex > 0) {
+              lastAttrValuesLength = goodsTypeAttributeList[attrIndex - 1].attrValues.split(',')
+                .length;
+            }
+            const key = `goodsAttributes[${lastAttrValuesLength + vaIndex}]`;
+            return (
+              <Checkbox
+                key={`${attr.id}_${val}`}
+                checked={isChecked(key, { val, attrId: attr.id })}
+                onChange={e => setValue(e.target.checked, key, { val, attrId: attr.id })}
+              >
+                {val}
+              </Checkbox>
+            );
+          })}
         </FormItem>
-      ))
-    }
+      ));
+    };
 
     const test = () => {
-      const a = formData.goodsAttributes && formData.goodsAttributes.filter(v=>v);
-      const result = {};
-      a && a.forEach(item => {
-        result[item.goodsTypeAttributeId] = result[item.goodsTypeAttributeId] || [];
-        result[item.goodsTypeAttributeId].push(item.goodsTypeAttributeValue);
-      });
-      const aa = [];
-      Object.keys(result).forEach(key => {
-        aa.push(result[key].length);
-      });
-
-      const MyMatrix = (props) => {
-        const length = props.reduce((x,y) => x * y);
-        const matrix = new Array(length).fill([]);
-        const row = MyArray(props);
-        return matrix.map(() => row.next());
-      };
-
-      const MyArray = (props) => {
-        const numbers = [];
-        props.forEach(p => {
-          numbers.push(new MyNumber(p));
-        });
-
-        const isLast = (index) => {
-          return index >= props.length - 1;
-        };
-
-        const next = (index = 0) => {
-          if(numbers[index].next()) {
-            if(isLast(index)) {
-              next();
-            } else {
-              next(index + 1);
-            }
-          }
-        };
-
-        return {
-          next: () => {
-            const result = numbers.map(num => num.get());
-            next();
-            return result;
-          },
-        };
-      };
-
-      const MyNumber = (length) => {
-        let num = 0;
-
-        const isLast = () => {
-          return num >= length - 1;
-        };
-
-        return {
-          next: () => {
-            if(isLast()) {
-              num = 0;
-              return true;
-            } else {
-              num += 1;
-              return false;
-            }
-          },
-          get: () => num,
+      const distinctAttr =
+        (formData.goodsAttributes && formData.goodsAttributes.filter(v => v)) || [];
+      const attrGroup = [];
+      distinctAttr.forEach(item => {
+        // 根据商品属性分组，同一属性的商品放到一组当中
+        const group = attrGroup.find(g =>
+          g.some(sub => sub.goodsTypeAttributeId === item.goodsTypeAttributeId)
+        );
+        if (group) {
+          group.push(item);
+        } else {
+          attrGroup.push([item]);
         }
-      };
-
-      if(aa.length > 1)
-        console.log(MyMatrix(aa));
-
+      });
     };
 
     return (
@@ -397,10 +340,7 @@ export default class GoodsForm extends PureComponent {
               </FormItem>
               <FormItem {...formItemLayout} label="库存数量" extra="如果没有sku则以当前数量为准">
                 {getFieldDecorator('stockNumber')(
-                  <InputNumber
-                    style={{ width: 200 }}
-                    placeholder="请输入商品的库存数量"
-                  />
+                  <InputNumber style={{ width: 200 }} placeholder="请输入商品的库存数量" />
                 )}
               </FormItem>
             </Card>
@@ -412,9 +352,7 @@ export default class GoodsForm extends PureComponent {
                 })(<GoodsTypeSelector style={{ width: 300 }} />)}
               </FormItem>
               {goodsTypeAttributeList.length > 0 && renderGoodsAttributes(goodsTypeAttributeList)}
-              {
-                test()
-              }
+              {test()}
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="库存信息">
