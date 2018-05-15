@@ -109,13 +109,13 @@ export default class GoodsSkus extends Component {
       },
     ];
 
-    columns.unshift(goodsTypeAttributes.map(attr => ({
-      title: attr.name,
-      dataIndex: attr.id,
-    })));
-
-    return (
-      <Table columns={columns} dataSource={value} />
+    columns.unshift(
+      goodsTypeAttributes.map(attr => ({
+        title: attr.name,
+        dataIndex: attr.id,
+      }))
     );
+
+    return <Table columns={columns} dataSource={value} />;
   }
 }
