@@ -23,16 +23,15 @@ export function refreshAuthority(appId, authority) {
   localStorage.setItem('_t', btoa(appId));
   localStorage.setItem('_t2', btoa(authority));
   refreshInterval = setInterval(() => {
-    const a = atob(localStorage.getItem('_t'));
-    if (!checkAuthority() && a) {
+    if (!checkAuthority() && authority) {
       const id = atob(localStorage.getItem('_t'));
       request(`/refresh/token`, {
         headers: {
           appId: id,
-          refreshToken: a,
+          refreshToken: authority,
         },
       }).then(response => {
-        setAuthority(response.data.accessToken, response.data.expiresIn);
+        setAuthority(response.accessToken, response.expiresIn);
       });
     }
   }, 3 * 1000);

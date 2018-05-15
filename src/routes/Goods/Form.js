@@ -119,12 +119,14 @@ export default class GoodsForm extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       form.resetFields();
+      const payload = {
+        ...formData,
+        ...fieldsValue,
+      };
+      Object.assign(payload, {goodsAttributes: payload.goodsAttributes.filter(v=>v)});
       dispatch({
         type: 'goods/save',
-        payload: {
-          ...formData,
-          ...fieldsValue,
-        },
+        payload,
       }).then(() => {
         this.handleGoBack();
       });
@@ -136,7 +138,7 @@ export default class GoodsForm extends PureComponent {
   };
 
   handleLoadAttributes = goodsTypeId => {
-    const { dispatch, goods: { formData: { goodsAttributes } }, form: { setFieldsValue } } = this.props;
+    const { dispatch } = this.props;
     if (goodsTypeId) {
       dispatch({
         type: 'goodsTypeAttribute/fetch',
@@ -152,12 +154,6 @@ export default class GoodsForm extends PureComponent {
         type: 'goodsTypeAttribute/queryList',
         payload: {},
       });
-      if(goodsAttributes) {
-        const allGoodsAttributes = goodsAttributes.map((attr, index) => ({
-          [`goodsAttributes[${index}]`]: null,
-        })).reduce((x, y) => Object.assign(x, y));
-        setFieldsValue(allGoodsAttributes);
-      }
     }
     return goodsTypeId;
   };

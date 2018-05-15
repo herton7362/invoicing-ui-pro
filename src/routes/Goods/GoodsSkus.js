@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Table, Input } from 'antd';
+import { Table, Input, InputNumber } from 'antd';
 
 export default class GoodsSkus extends Component {
   state = {
@@ -43,8 +43,8 @@ export default class GoodsSkus extends Component {
     });
 
     const attrCombo = this.getGoodsAttrCombo(attrGroup);
-    const getKey = attr=>Object.assign(attr, {
-      key: Object.keys(attr)
+    const addGoodsAttributeValues = attr=>Object.assign(attr, {
+      goodsAttributeValues: Object.keys(attr)
         .filter(key=>goodsTypeAttributes.some(goodsTypeAttr=>goodsTypeAttr.id === key))
         .sort()
         .map(key=>attr[key])
@@ -53,29 +53,33 @@ export default class GoodsSkus extends Component {
 
     const result = attrCombo.map(group => group.map(attr=>({
       [attr.goodsTypeAttributeId]: attr.goodsTypeAttributeValue,
-    })).reduce((x, y) => Object.assign(x, y))).map(getKey);
+      lastPurchasePrice: 0,
+      stockNumber: 0,
+    })).reduce((x, y) => Object.assign(x, y))).map(addGoodsAttributeValues);
 
     const compareSkuChanged = (skus1, skus2) => {
-      return skus1.length !== skus2.length || !skus1.every(sku1=>skus2.some(sku2=>sku2.key === sku1.key));
-    }
+      return skus1.length !== skus2.length || !skus1.every(sku1=>
+        skus2.some(sku2=>sku2.goodsAttributeValues === sku1.goodsAttributeValues));
+    };
 
     const addExtraProps = (source, target) => {
-      return target.map(targetRow=>Object.assign(targetRow, source.find(sourceRow=>sourceRow.key === targetRow.key)));
-    }
+      return target.map(targetRow=>Object.assign(targetRow, source.find(sourceRow=>
+        sourceRow.goodsAttributeValues === targetRow.goodsAttributeValues)));
+    };
 
     if(value) {
-      const keyInValue = value.map(getKey);
-      if(compareSkuChanged(result, keyInValue)) {
-        this.triggerChange(addExtraProps(keyInValue, result));
+      const attrInValue = value.map(addGoodsAttributeValues);
+      if(compareSkuChanged(result, attrInValue)) {
+        this.triggerChange(addExtraProps(attrInValue, result));
       } else {
-        return value;
+        return attrInValue;
       }
     } else {
       this.triggerChange(result);
     }
 
     return result;
-  }
+  };
 
   triggerChange = changedValue => {
     const { onChange } = this.props;
@@ -147,33 +151,56 @@ export default class GoodsSkus extends Component {
       {
         title: '条码',
         dataIndex: 'barcode',
-        render: (value, record, index) => {
-          return (
-            <Input
-              size="small"
-              value={value}
-              onChange={(e) => {
-                dataSource[index].barcode = e.target.value;
-                this.triggerChange(dataSource);
-              }}
-              style={{width: '150px'}}
-            />
-          );
-        },
+        align: 'center',
+        render: (value, record, index) => (
+          <Input
+            size="small"
+            value={value}
+            onChange={e => {
+              dataSource[index].barcode = e.target.value;
+              this.triggerChange(dataSource);
+            }}
+            style={{width: '150px'}}
+          />
+        ),
       },
       {
         title: '进货价',
         dataIndex: 'lastPurchasePrice',
+        align: 'center',
+        render: (value, record, index) => (
+          <InputNumber
+            size="small"
+            value={value}
+            onChange={val => {
+              dataSource[index].lastPurchasePrice = val;
+              this.triggerChange(dataSource);
+            }}
+            style={{width: '150px'}}
+          />
+        ),
       },
       {
         title: '库存数量',
         dataIndex: 'stockNumber',
+        align: 'center',
+        render: (value, record, index) => (
+          <InputNumber
+            size="small"
+            value={value}
+            onChange={val => {
+              dataSource[index].stockNumber = val;
+              this.triggerChange(dataSource);
+            }}
+            style={{width: '150px'}}
+          />
+        ),
       },
     ];
 
     columns.unshift(
       ...goodsTypeAttributes
-        .map(attr => ({title: attr.name, dataIndex: attr.id}))
+        .map(attr => ({title: attr.name, dataIndex: attr.id, align: 'center'}))
         .filter(attr => dataSource && dataSource.some(data => Object.keys(data).includes(attr.dataIndex)))
     );
 
