@@ -9,6 +9,7 @@ import numeral from 'numeral';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import CategorySelector from './category/CategorySelector';
 import GoodsTypeSelector from './type/GoodsTypeSelector';
+import GoodsSkus from './GoodsSkus';
 
 import styles from './Form.less';
 
@@ -80,6 +81,9 @@ const fieldLabels = {
       height: Form.createFormField({
         value: formData.height || 0,
       }),
+      goodsSkus: Form.createFormField({
+        value: formData.goodsSkus,
+      }),
       ...extra,
     };
   },
@@ -100,7 +104,7 @@ export default class GoodsForm extends PureComponent {
 
   componentDidMount() {
     const { goods: { formData } } = this.props;
-    if (formData.goodsTypeId) this.handleLoadAttributes(formData.goodsTypeId);
+    this.handleLoadAttributes(formData.goodsTypeId);
     window.addEventListener('resize', this.resizeFooterToolbar);
   }
 
@@ -132,7 +136,7 @@ export default class GoodsForm extends PureComponent {
   };
 
   handleLoadAttributes = goodsTypeId => {
-    const { dispatch } = this.props;
+    const { dispatch, goods: { formData: { goodsAttributes } }, form: { setFieldsValue } } = this.props;
     if (goodsTypeId) {
       dispatch({
         type: 'goodsTypeAttribute/fetch',
@@ -148,6 +152,12 @@ export default class GoodsForm extends PureComponent {
         type: 'goodsTypeAttribute/queryList',
         payload: {},
       });
+      if(goodsAttributes) {
+        const allGoodsAttributes = goodsAttributes.map((attr, index) => ({
+          [`goodsAttributes[${index}]`]: null,
+        })).reduce((x, y) => Object.assign(x, y));
+        setFieldsValue(allGoodsAttributes);
+      }
     }
     return goodsTypeId;
   };
@@ -266,23 +276,6 @@ export default class GoodsForm extends PureComponent {
       ));
     };
 
-    const test = () => {
-      const distinctAttr =
-        (formData.goodsAttributes && formData.goodsAttributes.filter(v => v)) || [];
-      const attrGroup = [];
-      distinctAttr.forEach(item => {
-        // 根据商品属性分组，同一属性的商品放到一组当中
-        const group = attrGroup.find(g =>
-          g.some(sub => sub.goodsTypeAttributeId === item.goodsTypeAttributeId)
-        );
-        if (group) {
-          group.push(item);
-        } else {
-          attrGroup.push([item]);
-        }
-      });
-    };
-
     return (
       <PageHeaderLayout>
         <div>
@@ -352,7 +345,13 @@ export default class GoodsForm extends PureComponent {
                 })(<GoodsTypeSelector style={{ width: 300 }} />)}
               </FormItem>
               {goodsTypeAttributeList.length > 0 && renderGoodsAttributes(goodsTypeAttributeList)}
-              {test()}
+              {goodsTypeAttributeList.length > 0 &&
+              getFieldDecorator('goodsSkus')(
+                <GoodsSkus
+                  goodsTypeAttributes={goodsTypeAttributeList}
+                  goodsAttributes={formData.goodsAttributes}
+                />
+              )}
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="库存信息">

@@ -33,6 +33,11 @@ export default class GoodsList extends PureComponent {
   };
 
   handleOpenAddModal = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'goods/saveForm',
+      payload: {},
+    });
     this.props.dispatch(routerRedux.push('/goods/modify'));
   };
 
