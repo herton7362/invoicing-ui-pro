@@ -173,13 +173,8 @@ export default class GoodsSkus extends Component {
 
     columns.unshift(
       ...goodsTypeAttributes
-        .map(attr => ({
-          title: attr.name,
-          dataIndex: attr.id,
-        }))
-        .filter(attr => {
-          return dataSource && dataSource.some(data => Object.keys(data).includes(attr.id));
-        })
+        .map(attr => ({title: attr.name, dataIndex: attr.id}))
+        .filter(attr => dataSource && dataSource.some(data => Object.keys(data).includes(attr.dataIndex)))
     );
 
     return (
