@@ -10,6 +10,7 @@ import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import CategorySelector from './category/CategorySelector';
 import GoodsTypeSelector from './type/GoodsTypeSelector';
 import GoodsSkus from './GoodsSkus';
+import AttributeCheckboxGroup from './AttributeCheckboxGroup';
 
 import styles from './Form.less';
 
@@ -30,19 +31,7 @@ const fieldLabels = {
 }))
 @Form.create({
   mapPropsToFields(props) {
-    const { goods: { formData: { goodsAttributes }, formData } } = props;
-    const extra = {};
-
-    if (goodsAttributes)
-      goodsAttributes.forEach((attr, index) => {
-        if (attr)
-          extra[`goodsAttributes[${index}]`] = Form.createFormField({
-            value: {
-              goodsTypeAttributeValue: attr.goodsTypeAttributeValue,
-              goodsTypeAttributeId: attr.goodsTypeAttributeId,
-            },
-          });
-      });
+    const { goods: { formData } } = props;
 
     return {
       goodsCategoryId: Form.createFormField({
@@ -84,7 +73,9 @@ const fieldLabels = {
       goodsSkus: Form.createFormField({
         value: formData.goodsSkus,
       }),
-      ...extra,
+      goodsAttributes: Form.createFormField({
+        value: formData.goodsAttributes,
+      }),
     };
   },
   onValuesChange(props, changedValues, allValues) {
@@ -103,8 +94,25 @@ export default class GoodsForm extends PureComponent {
   };
 
   componentDidMount() {
-    const { goods: { formData } } = this.props;
-    this.handleLoadAttributes(formData.goodsTypeId);
+    const { dispatch, match: { params: { id } } } = this.props;
+    if (id) {
+      dispatch({
+        type: 'goods/fetchOne',
+        payload: { id },
+        callback: response => {
+          this.handleLoadAttributes(response.goodsTypeId);
+        },
+      });
+    } else {
+      dispatch({
+        type: 'goods/saveForm',
+        payload: {},
+        callback: () => {
+          this.handleLoadAttributes();
+        },
+      });
+    }
+
     window.addEventListener('resize', this.resizeFooterToolbar);
   }
 
@@ -119,14 +127,12 @@ export default class GoodsForm extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       form.resetFields();
-      const payload = {
-        ...formData,
-        ...fieldsValue,
-      };
-      Object.assign(payload, {goodsAttributes: payload.goodsAttributes.filter(v=>v)});
       dispatch({
         type: 'goods/save',
-        payload,
+        payload: {
+          ...formData,
+          ...fieldsValue,
+        },
       }).then(() => {
         this.handleGoBack();
       });
@@ -172,7 +178,7 @@ export default class GoodsForm extends PureComponent {
       goods: { formData },
       goodsTypeAttribute: { data: { list: goodsTypeAttributeList } },
     } = this.props;
-    const { getFieldDecorator, setFieldsValue, getFieldValue, getFieldsError } = this.props.form;
+    const { getFieldDecorator, setFieldsValue, getFieldsError } = this.props.form;
 
     const errors = getFieldsError();
 
@@ -230,44 +236,25 @@ export default class GoodsForm extends PureComponent {
     };
 
     const renderGoodsAttributes = attrs => {
-      const isChecked = (key, value) => {
-        return (
-          getFieldValue(key) &&
-          value.val === getFieldValue(key).goodsTypeAttributeValue &&
-          value.attrId === getFieldValue(key).goodsTypeAttributeId
-        );
-      };
-      const setValue = (checked, key, value) => {
-        if (checked) {
-          setFieldsValue({
-            [key]: {
-              goodsTypeAttributeValue: value.val,
-              goodsTypeAttributeId: value.attrId,
-            },
-          });
-        } else {
-          setFieldsValue({ [key]: null });
-        }
-      };
-      return attrs.map((attr, attrIndex) => (
+      return attrs.map(attr => (
         <FormItem key={attr.id} {...formItemLayout} label={attr.name}>
-          {attr.attrValues.split(',').map((val, vaIndex) => {
-            let lastAttrValuesLength = 0;
-            if (attrIndex > 0) {
-              lastAttrValuesLength = goodsTypeAttributeList[attrIndex - 1].attrValues.split(',')
-                .length;
-            }
-            const key = `goodsAttributes[${lastAttrValuesLength + vaIndex}]`;
-            return (
-              <Checkbox
-                key={`${attr.id}_${val}`}
-                checked={isChecked(key, { val, attrId: attr.id })}
-                onChange={e => setValue(e.target.checked, key, { val, attrId: attr.id })}
-              >
-                {val}
-              </Checkbox>
-            );
-          })}
+          {getFieldDecorator('goodsAttributes')(
+            <AttributeCheckboxGroup>
+              {attr.attrValues.split(',').map(val => {
+                return (
+                  <Checkbox
+                    key={`${attr.id}_${val}`}
+                    value={{
+                      goodsTypeAttributeId: attr.id,
+                      goodsTypeAttributeValue: val,
+                    }}
+                  >
+                    {val}
+                  </Checkbox>
+                );
+              })}
+            </AttributeCheckboxGroup>
+          )}
         </FormItem>
       ));
     };
@@ -342,12 +329,12 @@ export default class GoodsForm extends PureComponent {
               </FormItem>
               {goodsTypeAttributeList.length > 0 && renderGoodsAttributes(goodsTypeAttributeList)}
               {goodsTypeAttributeList.length > 0 &&
-              getFieldDecorator('goodsSkus')(
-                <GoodsSkus
-                  goodsTypeAttributes={goodsTypeAttributeList}
-                  goodsAttributes={formData.goodsAttributes}
-                />
-              )}
+                getFieldDecorator('goodsSkus')(
+                  <GoodsSkus
+                    goodsTypeAttributes={goodsTypeAttributeList}
+                    goodsAttributes={formData.goodsAttributes}
+                  />
+                )}
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="库存信息">

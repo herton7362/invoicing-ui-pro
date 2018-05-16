@@ -8,10 +8,14 @@ export default class GoodsSkus extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    if('value' in nextProps && 'goodsAttributes' in nextProps && 'goodsTypeAttributes' in nextProps) {
+    if (
+      'value' in nextProps &&
+      'goodsAttributes' in nextProps &&
+      'goodsTypeAttributes' in nextProps
+    ) {
       const { value, goodsTypeAttributes, goodsAttributes } = nextProps;
       const dataSource = this.getSkusByGoodsAttributes(goodsTypeAttributes, goodsAttributes, value);
-      this.setState({dataSource});
+      this.setState({ dataSource });
     }
   }
 
@@ -43,33 +47,50 @@ export default class GoodsSkus extends Component {
     });
 
     const attrCombo = this.getGoodsAttrCombo(attrGroup);
-    const addGoodsAttributeValues = attr=>Object.assign(attr, {
-      goodsAttributeValues: Object.keys(attr)
-        .filter(key=>goodsTypeAttributes.some(goodsTypeAttr=>goodsTypeAttr.id === key))
-        .sort()
-        .map(key=>attr[key])
-        .join(','),
-    });
+    const addGoodsAttributeValues = attr =>
+      Object.assign(attr, {
+        goodsAttributeValues: Object.keys(attr)
+          .filter(key => goodsTypeAttributes.some(goodsTypeAttr => goodsTypeAttr.id === key))
+          .sort()
+          .map(key => attr[key])
+          .join(','),
+      });
 
-    const result = attrCombo.map(group => group.map(attr=>({
-      [attr.goodsTypeAttributeId]: attr.goodsTypeAttributeValue,
-      lastPurchasePrice: 0,
-      stockNumber: 0,
-    })).reduce((x, y) => Object.assign(x, y))).map(addGoodsAttributeValues);
+    const result = attrCombo
+      .map(group =>
+        group
+          .map(attr => ({
+            [attr.goodsTypeAttributeId]: attr.goodsTypeAttributeValue,
+            lastPurchasePrice: 0,
+            stockNumber: 0,
+          }))
+          .reduce((x, y) => Object.assign(x, y))
+      )
+      .map(addGoodsAttributeValues);
 
     const compareSkuChanged = (skus1, skus2) => {
-      return skus1.length !== skus2.length || !skus1.every(sku1=>
-        skus2.some(sku2=>sku2.goodsAttributeValues === sku1.goodsAttributeValues));
+      return (
+        skus1.length !== skus2.length ||
+        !skus1.every(sku1 =>
+          skus2.some(sku2 => sku2.goodsAttributeValues === sku1.goodsAttributeValues)
+        )
+      );
     };
 
     const addExtraProps = (source, target) => {
-      return target.map(targetRow=>Object.assign(targetRow, source.find(sourceRow=>
-        sourceRow.goodsAttributeValues === targetRow.goodsAttributeValues)));
+      return target.map(targetRow =>
+        Object.assign(
+          targetRow,
+          source.find(
+            sourceRow => sourceRow.goodsAttributeValues === targetRow.goodsAttributeValues
+          )
+        )
+      );
     };
 
-    if(value) {
+    if (value) {
       const attrInValue = value.map(addGoodsAttributeValues);
-      if(compareSkuChanged(result, attrInValue)) {
+      if (compareSkuChanged(result, attrInValue)) {
         this.triggerChange(addExtraProps(attrInValue, result));
       } else {
         return attrInValue;
@@ -160,7 +181,7 @@ export default class GoodsSkus extends Component {
               dataSource[index].barcode = e.target.value;
               this.triggerChange(dataSource);
             }}
-            style={{width: '150px'}}
+            style={{ width: '150px' }}
           />
         ),
       },
@@ -176,7 +197,7 @@ export default class GoodsSkus extends Component {
               dataSource[index].lastPurchasePrice = val;
               this.triggerChange(dataSource);
             }}
-            style={{width: '150px'}}
+            style={{ width: '150px' }}
           />
         ),
       },
@@ -192,7 +213,7 @@ export default class GoodsSkus extends Component {
               dataSource[index].stockNumber = val;
               this.triggerChange(dataSource);
             }}
-            style={{width: '150px'}}
+            style={{ width: '150px' }}
           />
         ),
       },
@@ -200,8 +221,10 @@ export default class GoodsSkus extends Component {
 
     columns.unshift(
       ...goodsTypeAttributes
-        .map(attr => ({title: attr.name, dataIndex: attr.id, align: 'center'}))
-        .filter(attr => dataSource && dataSource.some(data => Object.keys(data).includes(attr.dataIndex)))
+        .map(attr => ({ title: attr.name, dataIndex: attr.id, align: 'center' }))
+        .filter(
+          attr => dataSource && dataSource.some(data => Object.keys(data).includes(attr.dataIndex))
+        )
     );
 
     return (

@@ -33,21 +33,11 @@ export default class GoodsList extends PureComponent {
   };
 
   handleOpenAddModal = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'goods/saveForm',
-      payload: {},
-    });
-    this.props.dispatch(routerRedux.push('/goods/modify'));
+    this.props.dispatch(routerRedux.push('/goods/add'));
   };
 
   handleOpenEditModal = ({ id }) => {
-    this.props
-      .dispatch({
-        type: 'goods/fetchOne',
-        payload: { id },
-      })
-      .then(() => this.props.dispatch(routerRedux.push('/goods/modify')));
+    this.props.dispatch(routerRedux.push(`/goods/edit/${id}`));
   };
 
   render() {

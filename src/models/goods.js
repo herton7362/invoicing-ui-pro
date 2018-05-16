@@ -17,8 +17,9 @@ export default {
         payload: response,
       });
     },
-    *fetchOne({ payload }, { call, put }) {
+    *fetchOne({ payload, callback }, { call, put }) {
       const response = yield call(getOne, payload);
+      if (callback) callback(response);
       yield put({
         type: 'saveForm',
         payload: response,
