@@ -29,6 +29,9 @@ export default class CategorySelector extends Component {
     if ('value' in nextProps) {
       const { value } = nextProps;
       this.setState({ value });
+      if (!this.checkValueInItems(value)) {
+        this.handleSearch();
+      }
     }
   }
 
@@ -50,6 +53,11 @@ export default class CategorySelector extends Component {
       return;
     if (!('value' in this.props)) this.setState({ value: changedValue });
     if (onChange) onChange(changedValue);
+  };
+
+  checkValueInItems = value => {
+    const { goodsCategory: { data: { list } } } = this.props;
+    return list.some(row => row.id === value);
   };
 
   handleSearch = name => {

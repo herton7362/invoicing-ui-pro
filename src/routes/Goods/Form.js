@@ -107,10 +107,8 @@ export default class GoodsForm extends PureComponent {
       dispatch({
         type: 'goods/saveForm',
         payload: {},
-        callback: () => {
-          this.handleLoadAttributes();
-        },
       });
+      this.handleLoadAttributes();
     }
 
     window.addEventListener('resize', this.resizeFooterToolbar);

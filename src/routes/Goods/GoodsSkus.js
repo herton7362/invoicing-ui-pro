@@ -47,14 +47,16 @@ export default class GoodsSkus extends Component {
     });
 
     const attrCombo = this.getGoodsAttrCombo(attrGroup);
-    const addGoodsAttributeValues = attr =>
-      Object.assign(attr, {
-        goodsAttributeValues: Object.keys(attr)
-          .filter(key => goodsTypeAttributes.some(goodsTypeAttr => goodsTypeAttr.id === key))
-          .sort()
-          .map(key => attr[key])
-          .join(','),
-      });
+    const addGoodsAttributes = attr =>
+      attr.goodsAttributes
+        ? attr
+        : Object.assign(attr, {
+            goodsAttributes: Object.keys(attr)
+              .filter(key => goodsTypeAttributes.some(goodsTypeAttr => goodsTypeAttr.id === key))
+              .sort()
+              .map(key => `${key}:${attr[key]}`)
+              .join(','),
+          });
 
     const result = attrCombo
       .map(group =>
@@ -66,14 +68,18 @@ export default class GoodsSkus extends Component {
           }))
           .reduce((x, y) => Object.assign(x, y))
       )
-      .map(addGoodsAttributeValues);
+      .map(addGoodsAttributes);
+
+    const goodsAttributesMatch = (sku1, sku2) => {
+      return sku1.goodsAttributes
+        .split(',')
+        .every(sku => sku2.goodsAttributes.split(',').includes(sku));
+    };
 
     const compareSkuChanged = (skus1, skus2) => {
       return (
         skus1.length !== skus2.length ||
-        !skus1.every(sku1 =>
-          skus2.some(sku2 => sku2.goodsAttributeValues === sku1.goodsAttributeValues)
-        )
+        !skus1.every(sku1 => skus2.some(sku2 => goodsAttributesMatch(sku1, sku2)))
       );
     };
 
@@ -81,19 +87,17 @@ export default class GoodsSkus extends Component {
       return target.map(targetRow =>
         Object.assign(
           targetRow,
-          source.find(
-            sourceRow => sourceRow.goodsAttributeValues === targetRow.goodsAttributeValues
-          )
+          source.find(sourceRow => goodsAttributesMatch(sourceRow, targetRow))
         )
       );
     };
 
     if (value) {
-      const attrInValue = value.map(addGoodsAttributeValues);
+      const attrInValue = value.map(addGoodsAttributes);
       if (compareSkuChanged(result, attrInValue)) {
         this.triggerChange(addExtraProps(attrInValue, result));
       } else {
-        return attrInValue;
+        return addExtraProps(attrInValue, result);
       }
     } else {
       this.triggerChange(result);
