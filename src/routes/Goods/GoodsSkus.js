@@ -10,11 +10,10 @@ export default class GoodsSkus extends Component {
   componentWillReceiveProps(nextProps) {
     if (
       'value' in nextProps &&
-      'goodsAttributes' in nextProps &&
-      'goodsTypeAttributes' in nextProps
+      'goodsAttributes' in nextProps
     ) {
-      const { value, goodsTypeAttributes, goodsAttributes } = nextProps;
-      const dataSource = this.getSkusByGoodsAttributes(goodsTypeAttributes, goodsAttributes, value);
+      const { value, goodsAttributes } = nextProps;
+      const dataSource = this.getSkusByGoodsAttributes(goodsAttributes, value);
       this.setState({ dataSource });
     }
   }
@@ -31,7 +30,7 @@ export default class GoodsSkus extends Component {
     return [];
   };
 
-  getSkusByGoodsAttributes = (goodsTypeAttributes, goodsAttributes, value) => {
+  getSkusByGoodsAttributes = (goodsAttributes, value) => {
     const distinctAttr = (goodsAttributes && goodsAttributes.filter(v => v)) || [];
     const attrGroup = [];
     distinctAttr.forEach(item => {
@@ -52,7 +51,7 @@ export default class GoodsSkus extends Component {
         ? attr
         : Object.assign(attr, {
             goodsAttributes: Object.keys(attr)
-              .filter(key => goodsTypeAttributes.some(goodsTypeAttr => goodsTypeAttr.id === key))
+              .filter(key => goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key))
               .sort()
               .map(key => `${key}:${attr[key]}`)
               .join(','),
@@ -94,6 +93,7 @@ export default class GoodsSkus extends Component {
 
     if (value) {
       const attrInValue = value.map(addGoodsAttributes);
+
       if (compareSkuChanged(result, attrInValue)) {
         this.triggerChange(addExtraProps(attrInValue, result));
       } else {

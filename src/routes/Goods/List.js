@@ -6,6 +6,7 @@ import Ellipsis from 'components/Ellipsis';
 import numeral from 'numeral';
 import { getImgServerPath } from '../../utils/utils';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import GoodsSkuModal from './GoodsSkuModal';
 
 import styles from './List.less';
 
@@ -14,6 +15,11 @@ import styles from './List.less';
   loading: loading.models.goods,
 }))
 export default class GoodsList extends PureComponent {
+  state = {
+    skuVisible: false,
+    goodsId: null,
+  };
+
   componentDidMount() {
     this.props.dispatch({
       type: 'goods/fetch',
@@ -42,6 +48,7 @@ export default class GoodsList extends PureComponent {
 
   render() {
     const { goods: { list, total }, loading } = this.props;
+    const { skuVisible, goodsId } = this.state;
 
     const paginationProps = {
       showSizeChanger: true,
@@ -50,17 +57,26 @@ export default class GoodsList extends PureComponent {
       total,
     };
 
-    const ListContent = ({ data: { basicGoodsPrice: { retailPrice }, costPrice } }) => (
+    const ListContent = ({ data: { id, basicGoodsPrice: { retailPrice }, costPrice, goodsSkus, stockNumber } }) => (
       <div className={styles.listContent}>
         <div className={styles.listContentItem}>
           <p>价格：￥ {numeral(retailPrice).format('0,0.0')}</p>
           <p>利润：￥ {numeral(retailPrice - costPrice).format('0,0.0')}</p>
         </div>
         <div className={styles.listContentItem}>
-          <p>库存：10 件</p>
           <p>
-            <a>查看sku</a>
+            库存：
+            {
+              goodsSkus.length > 0
+                ? goodsSkus.map(goodsSku => goodsSku.stockNumber).reduce((x, y) => x + y)
+                : stockNumber
+            } 件
           </p>
+          {goodsSkus.length > 0 && (
+            <p style={{textAlign: 'center'}}>
+              <a onClick={() => this.setState({skuVisible: true, goodsId: id})}>查看sku</a>
+            </p>
+          )}
         </div>
       </div>
     );
@@ -124,13 +140,14 @@ export default class GoodsList extends PureComponent {
                         </Ellipsis>
                       </Tooltip>
                     }
-                    description={item.code}
+                    description={`条码：${item.barcode || '-'}`}
                   />
                   <ListContent data={item} />
                 </List.Item>
               )}
             />
           </Card>
+          <GoodsSkuModal visible={skuVisible} goodsId={goodsId} />
         </div>
       </PageHeaderLayout>
     );

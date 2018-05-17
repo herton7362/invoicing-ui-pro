@@ -241,8 +241,8 @@ export default class BasicLayout extends React.PureComponent {
             <GlobalFooter
               links={[
                 {
-                  key: 'Pro 首页',
-                  title: 'Pro 首页',
+                  key: 'Herton 首页',
+                  title: 'Herton 首页',
                   href: '/',
                   blankTarget: true,
                 },
