@@ -44,6 +44,7 @@ export default class GoodsTypeForm extends PureComponent {
       dispatch({
         type: 'goodsType/save',
         payload: {
+          ...formData,
           ...fieldsValue,
           id: formData.id,
         },
@@ -77,7 +78,6 @@ export default class GoodsTypeForm extends PureComponent {
       <Modal
         title="商品类别维护"
         visible={modalVisible}
-        onOk={this.okHandle}
         onCancel={() => handleModalVisible()}
         footer={[
           <Popconfirm key="delete" title="确定删除吗?" onConfirm={this.handleRemove}>

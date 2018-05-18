@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 
-import {connect} from "dva/index";
-import { Form, Modal } from 'antd';
+import { connect } from 'dva/index';
+import { Form, Modal, Button } from 'antd';
 
 import GoodsSkus from './GoodsSkus';
 
@@ -32,55 +32,50 @@ import GoodsSkus from './GoodsSkus';
   },
 })
 export default class GoodsForm extends PureComponent {
-  state = {
-    visible: false,
-  };
-
-  componentWillReceiveProps(nextProps) {
-    if ('visible' in nextProps && 'goodsId' in nextProps) {
-      const { visible, goodsId } = nextProps;
-      this.setState({ visible });
-      if(visible)
-        this.handleLoadGoods(goodsId);
-    }
-  }
-
-  handleLoadGoods(goodsId) {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'goods/fetchOne',
-      payload: { id: goodsId },
-      callback: response => {
-        dispatch({
-          type: 'goodsTypeAttribute/fetch',
-          payload: {
-            goodsTypeId: response.goodsTypeId,
-            logicallyDeleted: 0,
-            sort: 'sortNumber',
-            order: 'asc',
-          },
-        });
-      },
+  handleOk = () => {
+    const { form, onSaveSuccess, handleModalVisible, dispatch, goods: { formData } } = this.props;
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      dispatch({
+        type: 'goods/save',
+        payload: {
+          ...formData,
+          ...fieldsValue,
+          id: formData.id,
+        },
+      }).then(() => {
+        handleModalVisible();
+        onSaveSuccess();
+      });
     });
-  }
+  };
 
   render() {
     const {
+      submitting,
+      visible,
+      handleModalVisible,
       goods: { formData: { goodsAttributes } },
       goodsTypeAttribute: { data: { list: goodsTypeAttributeList } },
     } = this.props;
     const { getFieldDecorator } = this.props.form;
-    const { visible } = this.state;
 
     return (
       <Modal
         title="编辑商品货品信息"
         visible={visible}
         width={860}
-        onOk={() => this.setState({visible: false})}
-        onCancel={() => this.setState({visible: false})}
+        onCancel={() => handleModalVisible()}
+        footer={[
+          <Button key="cancel" onClick={() => handleModalVisible()}>
+            取消
+          </Button>,
+          <Button key="submit" type="primary" loading={submitting} onClick={this.handleOk}>
+            保存
+          </Button>,
+        ]}
       >
-        {goodsTypeAttributeList.length > 0 && getFieldDecorator('goodsSkus')(
+        {getFieldDecorator('goodsSkus')(
           <GoodsSkus
             goodsTypeAttributes={goodsTypeAttributeList}
             goodsAttributes={goodsAttributes}

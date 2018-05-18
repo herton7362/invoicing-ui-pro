@@ -8,10 +8,7 @@ export default class GoodsSkus extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    if (
-      'value' in nextProps &&
-      'goodsAttributes' in nextProps
-    ) {
+    if ('value' in nextProps && 'goodsAttributes' in nextProps) {
       const { value, goodsAttributes } = nextProps;
       const dataSource = this.getSkusByGoodsAttributes(goodsAttributes, value);
       this.setState({ dataSource });
@@ -51,7 +48,9 @@ export default class GoodsSkus extends Component {
         ? attr
         : Object.assign(attr, {
             goodsAttributes: Object.keys(attr)
-              .filter(key => goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key))
+              .filter(key =>
+                goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key)
+              )
               .sort()
               .map(key => `${key}:${attr[key]}`)
               .join(','),

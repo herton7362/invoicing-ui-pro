@@ -10,6 +10,7 @@ import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import CategorySelector from './category/CategorySelector';
 import GoodsTypeSelector from './type/GoodsTypeSelector';
 import GoodsSkus from './GoodsSkus';
+import Cover from './Cover';
 import AttributeCheckboxGroup from './AttributeCheckboxGroup';
 
 import styles from './Form.less';
@@ -22,11 +23,9 @@ const fieldLabels = {
   name: '商品名称',
 };
 
-@connect(({ goods, goodsCategory, goodsTypeAttribute, loading }) => ({
+@connect(({ goods, goodsTypeAttribute, loading }) => ({
   goods,
-  goodsCategory,
   goodsTypeAttribute,
-  fetchingGoodsCategory: loading.effects['goodsCategory/fetch'],
   submitting: loading.effects['goods/save'],
 }))
 @Form.create({
@@ -49,8 +48,14 @@ const fieldLabels = {
       remark: Form.createFormField({
         value: formData.remark,
       }),
+      coverImageId: Form.createFormField({
+        value: formData.coverImageId,
+      }),
       costPrice: Form.createFormField({
         value: formData.costPrice || 0,
+      }),
+      retailPrice: Form.createFormField({
+        value: formData.retailPrice || 0,
       }),
       stockNumber: Form.createFormField({
         value: formData.stockNumber || 0,
@@ -299,12 +304,17 @@ export default class GoodsForm extends PureComponent {
                 )}
               </FormItem>
               <FormItem {...formItemLayout} label="拼音码" extra="拼音码可以帮助您快捷搜索">
-                {getFieldDecorator('pinyin')(<Input style={{ width: 200 }} placeholder="请输入商品的拼音码" />)}
+                {getFieldDecorator('pinyin')(
+                  <Input style={{ width: 200 }} placeholder="请输入商品的拼音码" />
+                )}
               </FormItem>
               <FormItem {...formItemLayout} label="商品简单描述">
                 {getFieldDecorator('remark')(
                   <TextArea style={{ minHeight: 32 }} placeholder="请描述一下这个商品" rows={4} />
                 )}
+              </FormItem>
+              <FormItem {...formItemLayout} label="商品封面">
+                {getFieldDecorator('coverImageId')(<Cover />)}
               </FormItem>
               <FormItem {...formItemLayout} label="成本价">
                 {getFieldDecorator('costPrice')(
@@ -312,6 +322,15 @@ export default class GoodsForm extends PureComponent {
                     formatter={val => `￥ ${numeral(val).format('0,0.0')}`}
                     style={{ width: 200 }}
                     placeholder="请输入商品的成本价"
+                  />
+                )}
+              </FormItem>
+              <FormItem {...formItemLayout} label="零售价">
+                {getFieldDecorator('retailPrice')(
+                  <InputNumber
+                    formatter={val => `￥ ${numeral(val).format('0,0.0')}`}
+                    style={{ width: 200 }}
+                    placeholder="请输入商品的零售价"
                   />
                 )}
               </FormItem>
@@ -334,30 +353,34 @@ export default class GoodsForm extends PureComponent {
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="库存信息">
-              <FormItem {...formItemLayout} label="库存数量" extra="如果没有sku则以当前数量为准">
-                {getFieldDecorator('stockNumber', {
-                  rules: [
-                    {
-                      required: true,
-                      message: '请输入商品库存数量',
-                    },
-                  ],
-                })(
-                  <InputNumber style={{ width: 200 }} placeholder="请输入商品的库存数量" />
-                )}
-              </FormItem>
-              <FormItem {...formItemLayout} label="库存预警值" extra="当库存少于或等于库存警告设置数量时，后台会跳出提醒，提醒管理员增加库存">
-                {getFieldDecorator('stockWarnNumber', {
-                  rules: [
-                    {
-                      required: true,
-                      message: '请输入商品库存预警值',
-                    },
-                  ],
-                })(
-                  <InputNumber style={{ width: 200 }} placeholder="请输入商品的库存预警值" />
-                )}
-              </FormItem>
+              {!formData.goodsTypeId && (
+                <FormItem {...formItemLayout} label="库存数量" extra="如果没有sku则以当前数量为准">
+                  {getFieldDecorator('stockNumber', {
+                    rules: [
+                      {
+                        required: true,
+                        message: '请输入商品库存数量',
+                      },
+                    ],
+                  })(<InputNumber style={{ width: 200 }} placeholder="请输入商品的库存数量" />)}
+                </FormItem>
+              )}
+              {!formData.goodsTypeId && (
+                <FormItem
+                  {...formItemLayout}
+                  label="库存预警值"
+                  extra="当库存少于或等于库存警告设置数量时，后台会跳出提醒，提醒管理员增加库存"
+                >
+                  {getFieldDecorator('stockWarnNumber', {
+                    rules: [
+                      {
+                        required: true,
+                        message: '请输入商品库存预警值',
+                      },
+                    ],
+                  })(<InputNumber style={{ width: 200 }} placeholder="请输入商品的库存预警值" />)}
+                </FormItem>
+              )}
               <FormItem {...formItemLayout} label="重量">
                 {getFieldDecorator('weight')(
                   <InputNumber

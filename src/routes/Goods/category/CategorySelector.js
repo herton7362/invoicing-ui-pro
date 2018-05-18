@@ -29,7 +29,7 @@ export default class CategorySelector extends Component {
     if ('value' in nextProps) {
       const { value } = nextProps;
       this.setState({ value });
-      if (!this.checkValueInItems(value)) {
+      if (value !== null && value !== undefined && !this.checkValueInItems(value)) {
         this.handleSearch();
       }
     }
