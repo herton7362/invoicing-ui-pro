@@ -71,7 +71,10 @@ export default class GoodsSkus extends Component {
     const goodsAttributesMatch = (sku1, sku2) => {
       return sku1.goodsAttributes
         .split(',')
-        .every(sku => sku2.goodsAttributes.split(',').includes(sku));
+        .every(sku => sku2.goodsAttributes.split(',').includes(sku))
+        && sku2.goodsAttributes
+          .split(',')
+          .every(sku => sku1.goodsAttributes.split(',').includes(sku));
     };
 
     const compareSkuChanged = (skus1, skus2) => {

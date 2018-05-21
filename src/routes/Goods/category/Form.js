@@ -75,7 +75,7 @@ export default class GoodsCategoryForm extends PureComponent {
   };
 
   render() {
-    const { modalVisible, form: { getFieldDecorator }, onCancel, submitting } = this.props;
+    const { modalVisible, form: { getFieldDecorator }, onCancel, submitting, goodsCategory: { formData } } = this.props;
 
     const formItemLayout = {
       labelCol: {
@@ -94,9 +94,11 @@ export default class GoodsCategoryForm extends PureComponent {
         visible={modalVisible}
         onCancel={onCancel}
         footer={[
-          <Popconfirm key="delete" title="确定删除吗?" onConfirm={this.handleRemove}>
-            <Button type="danger">删除</Button>
-          </Popconfirm>,
+          formData.id && (
+            <Popconfirm key="delete" title="确定删除吗?" onConfirm={this.handleRemove}>
+              <Button type="danger">删除</Button>
+            </Popconfirm>
+          ),
           <Button key="cancel" onClick={() => onCancel()}>
             取消
           </Button>,

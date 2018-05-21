@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 export default class AutoFocus extends Component {
   static defaultProps = {
-    focus: false,
+    focus: true,
   };
 
   static propTypes = {

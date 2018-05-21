@@ -1,25 +1,22 @@
 import React, { PureComponent, Fragment } from 'react';
+import {connect} from "dva/index";
+import { Form, Card, Button, Table, Input, Divider, Popconfirm, message } from "antd";
 
-import { connect } from 'dva/index';
-import { Card, Divider, Table, Button, message, Popconfirm, Input } from 'antd';
-import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import attribute from './Attribute';
-import GoodsTypeForm from './GoodsTypeForm';
-import AttributeForm from './AttributeForm';
+import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import SaveForm from './Form';
 
-import styles from './GoodsType.less';
+import styles from './Supplier.less';
 
 const { Search } = Input;
 
-@connect(({ goodsType, goodsTypeAttribute, loading }) => ({
-  goodsType,
-  goodsTypeAttribute,
-  loading: loading.models.goodsType || loading.models.goodsTypeAttribute,
+@connect(({ businessRelatedUnit, loading }) => ({
+  businessRelatedUnit,
+  loading: loading.models.businessRelatedUnit,
 }))
-export default class GoodsTypeList extends PureComponent {
+@Form.create()
+export default class SupplierList extends PureComponent {
   state = {
     modalVisible: false,
-    attrModalVisible: false,
     currentPage: 1,
     pageSize: 15,
   };
@@ -37,7 +34,7 @@ export default class GoodsTypeList extends PureComponent {
     const { dispatch } = this.props;
     const { currentPage, pageSize } = this.state;
     dispatch({
-      type: 'goodsType/fetch',
+      type: 'businessRelatedUnit/fetch',
       payload: {
         currentPage,
         pageSize,
@@ -69,28 +66,9 @@ export default class GoodsTypeList extends PureComponent {
     });
   };
 
-  handleAttrModalVisible = flag => {
-    this.setState({
-      attrModalVisible: !!flag,
-    });
-  };
-
-  handleRemove = id => {
-    this.props.dispatch({
-      type: 'goodsType/remove',
-      payload: {
-        id,
-      },
-      callback: () => {
-        this.handleSearch();
-        message.success('删除成功');
-      },
-    });
-  };
-
   handleOpenAddModal = () => {
     this.props.dispatch({
-      type: 'goodsType/saveForm',
+      type: 'businessRelatedUnit/saveForm',
       payload: {},
     });
     this.handleModalVisible(true);
@@ -98,65 +76,50 @@ export default class GoodsTypeList extends PureComponent {
 
   handleOpenEditModal = id => {
     this.props.dispatch({
-      type: 'goodsType/fetchOne',
+      type: 'businessRelatedUnit/fetchOne',
       payload: { id },
-    }).then(() => this.handleModalVisible(true));
-  };
-
-  handleOpenAddAttrModal = goodsTypeId => {
-    this.props.dispatch({
-      type: 'goodsTypeAttribute/saveForm',
-      payload: {
-        goodsTypeId,
-      },
     });
-    this.handleAttrModalVisible(true);
+    this.handleModalVisible(true);
   };
 
-  handleOpenEditAttrModal = id => {
-    this.props
-      .dispatch({
-        type: 'goodsTypeAttribute/fetchOne',
-        payload: { id },
-      }).then(() => this.handleAttrModalVisible(true));
-  };
-
-  handleAttrRemove = id => {
+  handleRemove = id => {
     this.props.dispatch({
-      type: 'goodsTypeAttribute/remove',
+      type: 'businessRelatedUnit/remove',
       payload: {
         id,
       },
-      callback: () => {
-        this.handleSearch();
-        message.success('删除成功');
-      },
+    }).then(() => {
+      this.handleSearch();
+      message.success('删除成功');
     });
   };
 
   render() {
-    const { goodsType: { data: { list, pagination } }, loading } = this.props;
-    const { modalVisible, attrModalVisible, pageSize } = this.state;
+    const { businessRelatedUnit: { data: { list, pagination } }, loading } = this.props;
+    const { modalVisible, pageSize } = this.state;
 
     const columns = [
       {
-        title: '商品类别名称',
+        title: '名称',
         dataIndex: 'name',
       },
       {
-        title: '属性',
-        render: (val, record) =>
-          record.goodsTypeAttributes && record.goodsTypeAttributes.length > 0
-            ? record.goodsTypeAttributes.map(attr => attr.name).join('，')
-            : '---',
+        title: '电话',
+        dataIndex: 'telephone',
+      },
+      {
+        title: '手机',
+        dataIndex: 'mobile',
+      },
+      {
+        title: '电子邮件',
+        dataIndex: 'email',
       },
       {
         title: '操作',
         render: (val, record) => (
           <Fragment>
             <a onClick={() => this.handleOpenEditModal(record.id)}>编辑</a>
-            <Divider type="vertical" />
-            <a onClick={() => this.handleOpenAddAttrModal(record.id)}>添加属性</a>
             <Divider type="vertical" />
             <Popconfirm
               title={`确定删除${record.name}吗?`}
@@ -179,16 +142,15 @@ export default class GoodsTypeList extends PureComponent {
     const parentMethods = {
       onSaveSuccess: this.onSaveSuccess,
       handleModalVisible: this.handleModalVisible,
-      handleAttrModalVisible: this.handleAttrModalVisible,
       onCancel: this.handleModalVisible,
     };
 
     return (
       <PageHeaderLayout>
-        <div className={styles.goodsType}>
+        <div className={styles.supplier}>
           <Card
             bordered={false}
-            title="商品属性"
+            title="供应商"
             bodyStyle={{ padding: '0 32px 40px 32px' }}
             extra={
               <Search
@@ -214,14 +176,10 @@ export default class GoodsTypeList extends PureComponent {
               pagination={paginationProps}
               columns={columns}
               onChange={this.handleStandardTableChange}
-              expandedRowRender={record =>
-                attribute(record, this.handleOpenEditAttrModal, this.handleAttrRemove)
-              }
             />
           </Card>
-          <GoodsTypeForm {...parentMethods} modalVisible={modalVisible} />
-          <AttributeForm {...parentMethods} modalVisible={attrModalVisible} />
         </div>
+        <SaveForm {...parentMethods} modalVisible={modalVisible} />
       </PageHeaderLayout>
     );
   }

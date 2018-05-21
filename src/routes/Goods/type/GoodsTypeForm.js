@@ -55,8 +55,23 @@ export default class GoodsTypeForm extends PureComponent {
     });
   };
 
+  handleRemove = () => {
+    const { onSaveSuccess, handleModalVisible, dispatch, goodsType: { formData } } = this.props;
+    dispatch({
+      type: 'goodsType/remove',
+      payload: {
+        id: formData.id,
+      },
+      callback: () => {
+        handleModalVisible();
+        onSaveSuccess();
+      },
+    });
+  };
+
   render() {
     const {
+      goodsType: { formData },
       modalVisible,
       form: { getFieldDecorator },
       handleModalVisible,
@@ -80,9 +95,11 @@ export default class GoodsTypeForm extends PureComponent {
         visible={modalVisible}
         onCancel={() => handleModalVisible()}
         footer={[
-          <Popconfirm key="delete" title="确定删除吗?" onConfirm={this.handleRemove}>
-            <Button type="danger">删除</Button>
-          </Popconfirm>,
+          formData.id && (
+            <Popconfirm key="delete" title="确定删除吗?" onConfirm={this.handleRemove}>
+              <Button type="danger">删除</Button>
+            </Popconfirm>
+          ),
           <Button key="cancel" onClick={() => onCancel()}>
             取消
           </Button>,

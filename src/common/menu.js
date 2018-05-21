@@ -48,16 +48,12 @@ const menuData = [
     path: 'purchase',
     children: [
       {
-        name: '订单列表',
-        path: 'list',
+        name: '采购订单',
+        path: 'order',
       },
       {
-        name: '添加订单',
-        path: 'new',
-      },
-      {
-        name: '采购入库',
-        path: 'in-store',
+        name: '供应商',
+        path: 'supplier',
       },
     ],
   },

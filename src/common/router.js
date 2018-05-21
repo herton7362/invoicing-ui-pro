@@ -92,6 +92,16 @@ export const getRouterData = app => {
         import('../routes/Goods/type/GoodsType')
       ),
     },
+    '/purchase/order': {
+      component: dynamicWrapper(app, ['goodsType', 'goodsTypeAttribute'], () =>
+        import('../routes/Purchase/Order')
+      ),
+    },
+    '/purchase/supplier': {
+      component: dynamicWrapper(app, ['businessRelatedUnit'], () =>
+        import('../routes/Supplier/Supplier')
+      ),
+    },
 
     '/dashboard/analysis': {
       component: dynamicWrapper(app, ['chart'], () => import('../routes/Dashboard/Analysis')),
