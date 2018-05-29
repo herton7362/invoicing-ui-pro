@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva/index';
 import { routerRedux } from 'dva/router';
-import { Card, Form, Button, Input, InputNumber, Popover, Icon, Checkbox } from 'antd';
+import { Card, Form, Button, Input, InputNumber, Popover, Icon } from 'antd';
 import Pinyin from 'components/Pinyin';
 import FooterToolbar from 'components/FooterToolbar';
 import numeral from 'numeral';
@@ -83,6 +83,9 @@ const fieldLabels = {
       }),
       goodsAttributes: Form.createFormField({
         value: formData.goodsAttributes,
+      }),
+      goodsSuppliers: Form.createFormField({
+        value: formData.goodsSuppliers,
       }),
     };
   },
@@ -179,11 +182,7 @@ export default class GoodsForm extends PureComponent {
   };
 
   render() {
-    const {
-      submitting,
-      goods: { formData },
-      goodsTypeAttribute: { data: { list: goodsTypeAttributeList } },
-    } = this.props;
+    const { submitting, goods: { formData } } = this.props;
     const { getFieldDecorator, setFieldsValue, getFieldsError } = this.props.form;
 
     const errors = getFieldsError();
@@ -239,30 +238,6 @@ export default class GoodsForm extends PureComponent {
         sm: { span: 12 },
         md: { span: 10 },
       },
-    };
-
-    const renderGoodsAttributes = attrs => {
-      return attrs.map(attr => (
-        <FormItem key={attr.id} {...formItemLayout} label={attr.name}>
-          {getFieldDecorator('goodsAttributes')(
-            <AttributeCheckboxGroup>
-              {attr.attrValues.split(',').map(val => {
-                return (
-                  <Checkbox
-                    key={`${attr.id}_${val}`}
-                    value={{
-                      goodsTypeAttributeId: attr.id,
-                      goodsTypeAttributeValue: val,
-                    }}
-                  >
-                    {val}
-                  </Checkbox>
-                );
-              })}
-            </AttributeCheckboxGroup>
-          )}
-        </FormItem>
-      ));
     };
 
     return (
@@ -342,14 +317,10 @@ export default class GoodsForm extends PureComponent {
                   getValueFromEvent: this.handleLoadAttributes,
                 })(<GoodsTypeSelector style={{ width: 300 }} />)}
               </FormItem>
-              {goodsTypeAttributeList.length > 0 && renderGoodsAttributes(goodsTypeAttributeList)}
-              {goodsTypeAttributeList.length > 0 &&
-                getFieldDecorator('goodsSkus')(
-                  <GoodsSkus
-                    goodsTypeAttributes={goodsTypeAttributeList}
-                    goodsAttributes={formData.goodsAttributes}
-                  />
-                )}
+              {getFieldDecorator('goodsAttributes')(<AttributeCheckboxGroup {...formItemLayout} />)}
+              {getFieldDecorator('goodsSkus')(
+                <GoodsSkus goodsAttributes={formData.goodsAttributes} />
+              )}
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="库存信息">

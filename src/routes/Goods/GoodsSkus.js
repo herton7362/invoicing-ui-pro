@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 
 import { Table, Input, InputNumber } from 'antd';
+import { connect } from 'dva/index';
 
+@connect(({ goodsTypeAttribute }) => ({
+  goodsTypeAttribute,
+}))
 export default class GoodsSkus extends Component {
   state = {
     dataSource: null,
@@ -69,12 +73,12 @@ export default class GoodsSkus extends Component {
       .map(addGoodsAttributes);
 
     const goodsAttributesMatch = (sku1, sku2) => {
-      return sku1.goodsAttributes
-        .split(',')
-        .every(sku => sku2.goodsAttributes.split(',').includes(sku))
-        && sku2.goodsAttributes
+      return (
+        sku1.goodsAttributes
           .split(',')
-          .every(sku => sku1.goodsAttributes.split(',').includes(sku));
+          .every(sku => sku2.goodsAttributes.split(',').includes(sku)) &&
+        sku2.goodsAttributes.split(',').every(sku => sku1.goodsAttributes.split(',').includes(sku))
+      );
     };
 
     const compareSkuChanged = (skus1, skus2) => {
@@ -171,7 +175,7 @@ export default class GoodsSkus extends Component {
   };
 
   render() {
-    const { goodsTypeAttributes } = this.props;
+    const { goodsTypeAttribute: { data: { list: goodsTypeAttributes = [] } } } = this.props;
     const { dataSource } = this.state;
 
     const columns = [
@@ -234,13 +238,17 @@ export default class GoodsSkus extends Component {
     );
 
     return (
-      <Table
-        size="small"
-        rowKey={record => `${goodsTypeAttributes.map(attr => record[attr.id])}`}
-        columns={columns}
-        dataSource={dataSource}
-        pagination={false}
-      />
+      <div>
+        {goodsTypeAttributes.length > 0 && (
+          <Table
+            size="small"
+            rowKey={record => `${goodsTypeAttributes.map(attr => record[attr.id])}`}
+            columns={columns}
+            dataSource={dataSource}
+            pagination={false}
+          />
+        )}
+      </div>
     );
   }
 }
