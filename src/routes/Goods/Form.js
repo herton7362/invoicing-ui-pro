@@ -12,6 +12,7 @@ import GoodsTypeSelector from './type/GoodsTypeSelector';
 import GoodsSkus from './GoodsSkus';
 import Cover from './Cover';
 import AttributeCheckboxGroup from './AttributeCheckboxGroup';
+import SupplierSelectTable from './SupplierSelectTable';
 
 import styles from './Form.less';
 
@@ -319,7 +320,20 @@ export default class GoodsForm extends PureComponent {
               </FormItem>
               {getFieldDecorator('goodsAttributes')(<AttributeCheckboxGroup {...formItemLayout} />)}
               {getFieldDecorator('goodsSkus')(
-                <GoodsSkus goodsAttributes={formData.goodsAttributes} />
+                <FormItem
+                  labelCol={{
+                    xs: { span: 24 },
+                    sm: { span: 3 },
+                  }}
+                  wrapperCol={{
+                    xs: { span: 24 },
+                    sm: { span: 21 },
+                    md: { span: 19 },
+                  }}
+                  label="商品sku"
+                >
+                  <GoodsSkus goodsAttributes={formData.goodsAttributes} />
+                </FormItem>
               )}
             </Card>
 
@@ -352,6 +366,22 @@ export default class GoodsForm extends PureComponent {
                   })(<InputNumber style={{ width: 200 }} placeholder="请输入商品的库存预警值" />)}
                 </FormItem>
               )}
+              <FormItem
+                labelCol={{
+                  xs: { span: 24 },
+                  sm: { span: 3 },
+                }}
+                wrapperCol={{
+                  xs: { span: 24 },
+                  sm: { span: 21 },
+                  md: { span: 19 },
+                }}
+                label="供应商"
+              >
+                {getFieldDecorator('goodsSuppliers')(
+                  <SupplierSelectTable />
+                )}
+              </FormItem>
               <FormItem {...formItemLayout} label="重量">
                 {getFieldDecorator('weight')(
                   <InputNumber
