@@ -85,7 +85,12 @@ export default class BusinessRelatedUnitForm extends PureComponent {
   };
 
   handleRemove = () => {
-    const { onSaveSuccess, handleModalVisible, dispatch, businessRelatedUnit: { formData } } = this.props;
+    const {
+      onSaveSuccess,
+      handleModalVisible,
+      dispatch,
+      businessRelatedUnit: { formData },
+    } = this.props;
     dispatch({
       type: 'businessRelatedUnit/remove',
       payload: {
@@ -179,24 +184,16 @@ export default class BusinessRelatedUnitForm extends PureComponent {
           )}
         </FormItem>
         <FormItem {...formItemLayout} label="地址">
-          {getFieldDecorator('detailAddress')(
-            <Input placeholder="请输入供应商的地址" />
-          )}
+          {getFieldDecorator('detailAddress')(<Input placeholder="请输入供应商的地址" />)}
         </FormItem>
         <FormItem {...formItemLayout} label="开户银行">
-          {getFieldDecorator('depositBank')(
-            <Input placeholder="请输入供应商的开户银行" />
-          )}
+          {getFieldDecorator('depositBank')(<Input placeholder="请输入供应商的开户银行" />)}
         </FormItem>
         <FormItem {...formItemLayout} label="银行账号">
-          {getFieldDecorator('bankAccount')(
-            <Input placeholder="请输入供应商的银行账号" />
-          )}
+          {getFieldDecorator('bankAccount')(<Input placeholder="请输入供应商的银行账号" />)}
         </FormItem>
         <FormItem {...formItemLayout} label="备注">
-          {getFieldDecorator('remark')(
-            <Input placeholder="请输入备注" />
-          )}
+          {getFieldDecorator('remark')(<Input placeholder="请输入备注" />)}
         </FormItem>
       </Modal>
     );

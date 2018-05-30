@@ -11,12 +11,9 @@ import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 @Form.create()
 export default class GoodsList extends PureComponent {
   render() {
-    const {goods: {list, total}, loading} = this.props;
     return (
       <PageHeaderLayout>
-        <Card bordered={false}>
-          88
-        </Card>
+        <Card bordered={false}>88</Card>
       </PageHeaderLayout>
     );
   }

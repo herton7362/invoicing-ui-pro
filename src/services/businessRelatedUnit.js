@@ -2,7 +2,9 @@ import { stringify } from 'qs';
 import request from '../utils/request';
 
 export async function query({ currentPage = 1, pageSize = 15, ...rest } = {}) {
-  return request(`/api/businessRelatedUnit?currentPage=${currentPage}&pageSize=${pageSize}&${stringify(rest)}`);
+  return request(
+    `/api/businessRelatedUnit?currentPage=${currentPage}&pageSize=${pageSize}&${stringify(rest)}`
+  );
 }
 
 export async function getOne({ id }) {

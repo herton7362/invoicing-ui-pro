@@ -75,7 +75,13 @@ export default class GoodsCategoryForm extends PureComponent {
   };
 
   render() {
-    const { modalVisible, form: { getFieldDecorator }, onCancel, submitting, goodsCategory: { formData } } = this.props;
+    const {
+      modalVisible,
+      form: { getFieldDecorator },
+      onCancel,
+      submitting,
+      goodsCategory: { formData },
+    } = this.props;
 
     const formItemLayout = {
       labelCol: {

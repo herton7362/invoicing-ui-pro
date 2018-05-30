@@ -97,10 +97,12 @@ export default class GoodsTypeList extends PureComponent {
   };
 
   handleOpenEditModal = id => {
-    this.props.dispatch({
-      type: 'goodsType/fetchOne',
-      payload: { id },
-    }).then(() => this.handleModalVisible(true));
+    this.props
+      .dispatch({
+        type: 'goodsType/fetchOne',
+        payload: { id },
+      })
+      .then(() => this.handleModalVisible(true));
   };
 
   handleOpenAddAttrModal = goodsTypeId => {
@@ -118,7 +120,8 @@ export default class GoodsTypeList extends PureComponent {
       .dispatch({
         type: 'goodsTypeAttribute/fetchOne',
         payload: { id },
-      }).then(() => this.handleAttrModalVisible(true));
+      })
+      .then(() => this.handleAttrModalVisible(true));
   };
 
   handleAttrRemove = id => {
@@ -190,12 +193,7 @@ export default class GoodsTypeList extends PureComponent {
             bordered={false}
             title="商品属性"
             bodyStyle={{ padding: '0 32px 40px 32px' }}
-            extra={
-              <Search
-                placeholder="请输入"
-                onSearch={name => this.handleSearch({ name })}
-              />
-            }
+            extra={<Search placeholder="请输入" onSearch={name => this.handleSearch({ name })} />}
           >
             <div className={styles.operator}>
               <Button

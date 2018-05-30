@@ -1,11 +1,11 @@
 import React, { Component, Fragment } from 'react';
 
-import { Table, Input, InputNumber, Divider, Popconfirm } from 'antd';
+import { Table, InputNumber, Popconfirm } from 'antd';
 import SupplierSelector from '../Supplier/SupplierSelector';
 
 export default class GoodsTypeSelector extends Component {
   state = {
-    value: null,
+    value: [],
   };
 
   componentWillReceiveProps(nextProps) {
@@ -17,10 +17,40 @@ export default class GoodsTypeSelector extends Component {
 
   triggerChange = changedValue => {
     const { onChange } = this.props;
-    if (!('value' in this.props))
-      this.setState({ value: changedValue });
-    if (onChange)
-      onChange(changedValue);
+    if (!('value' in this.props)) this.setState({ value: changedValue });
+    if (onChange) onChange(changedValue);
+  };
+
+  handleAddRow = () => {
+    this.setState(({ value = [], index = 0 }) => ({
+      value: [
+        ...value,
+        {
+          key: index,
+          businessRelatedUnitId: null,
+          minimumCount: 0,
+          price: 0,
+        },
+      ],
+      index: index + 1,
+    }));
+  };
+
+  handerSaveRow = (rowIndex, record) => {
+    const { value = [] } = this.state;
+    const list = value.map((val, i) => (i === rowIndex ? Object.assign(val, record) : val));
+
+    if (list[rowIndex].businessRelatedUnitId) {
+      this.triggerChange(list);
+    } else {
+      this.setState({ value: list });
+    }
+  };
+
+  handleRemove = index => {
+    const { value = [] } = this.state;
+    value.splice(index, 1);
+    this.setState({ value });
   };
 
   render() {
@@ -28,30 +58,52 @@ export default class GoodsTypeSelector extends Component {
     const columns = [
       {
         title: '供应商',
-        render: (val, record) =>
-          <SupplierSelector value={record.businessRelatedUnitId} />,
+        dataIndex: 'businessRelatedUnitId',
+        render: (val, record, index) => (
+          <SupplierSelector
+            size="small"
+            value={val}
+            onChange={v => this.handerSaveRow(index, { businessRelatedUnitId: v })}
+          />
+        ),
       },
       {
         title: '最少数量',
-        render: (val, record) =>
-          <Input value={record.minimumCount} />,
+        dataIndex: 'minimumCount',
+        width: 130,
+        align: 'center',
+        render: (val, record, index) => (
+          <InputNumber
+            size="small"
+            value={val}
+            style={{ width: '100%' }}
+            onChange={v => this.handerSaveRow(index, { minimumCount: v })}
+          />
+        ),
       },
       {
         title: '单价',
-        render: (val, record) =>
-          <InputNumber value={record.price} />,
+        dataIndex: 'price',
+        width: 130,
+        align: 'center',
+        render: (val, record, index) => (
+          <InputNumber
+            size="small"
+            value={val}
+            style={{ width: '100%' }}
+            onChange={v => this.handerSaveRow(index, { price: v })}
+          />
+        ),
       },
       {
         title: '操作',
-        render: (val, record) => (
+        width: 120,
+        align: 'center',
+        render: (val, record, index) => (
           <Fragment>
-            <a onClick={() => this.handleOpenEditModal(record.id)}>编辑</a>
-            <Divider type="vertical" />
-            <a onClick={() => this.handleOpenAddAttrModal(record.id)}>添加属性</a>
-            <Divider type="vertical" />
             <Popconfirm
               title={`确定删除${record.name}吗?`}
-              onConfirm={() => this.handleRemove(record.id)}
+              onConfirm={() => this.handleRemove(index)}
             >
               <a>删除</a>
             </Popconfirm>
@@ -63,12 +115,13 @@ export default class GoodsTypeSelector extends Component {
     return (
       <Fragment>
         <Table
+          rowKey={record => record.businessRelatedUnitId || record.key}
           dataSource={value}
           pagination={false}
           columns={columns}
           size="small"
         />
-        <a onClick={this.handleOpenAddModal}>添加供应商</a>
+        <a onClick={this.handleAddRow}>添加供应商</a>
       </Fragment>
     );
   }

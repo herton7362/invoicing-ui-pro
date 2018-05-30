@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
-import {connect} from "dva/index";
-import { Form, Card, Button, Table, Input, Divider, Popconfirm, message } from "antd";
+import { connect } from 'dva/index';
+import { Form, Card, Button, Table, Input, Divider, Popconfirm, message } from 'antd';
 
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import SaveForm from './Form';
@@ -83,15 +83,17 @@ export default class SupplierList extends PureComponent {
   };
 
   handleRemove = id => {
-    this.props.dispatch({
-      type: 'businessRelatedUnit/remove',
-      payload: {
-        id,
-      },
-    }).then(() => {
-      this.handleSearch();
-      message.success('删除成功');
-    });
+    this.props
+      .dispatch({
+        type: 'businessRelatedUnit/remove',
+        payload: {
+          id,
+        },
+      })
+      .then(() => {
+        this.handleSearch();
+        message.success('删除成功');
+      });
   };
 
   render() {
@@ -152,12 +154,7 @@ export default class SupplierList extends PureComponent {
             bordered={false}
             title="供应商"
             bodyStyle={{ padding: '0 32px 40px 32px' }}
-            extra={
-              <Search
-                placeholder="请输入"
-                onSearch={name => this.handleSearch({ name })}
-              />
-            }
+            extra={<Search placeholder="请输入" onSearch={name => this.handleSearch({ name })} />}
           >
             <div className={styles.operator}>
               <Button

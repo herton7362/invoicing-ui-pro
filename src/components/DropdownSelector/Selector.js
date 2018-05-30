@@ -73,6 +73,7 @@ class Selector extends Component {
       onSearch,
       onAdd,
       onEdit,
+      size,
       ...rest
     } = this.props;
 
@@ -88,6 +89,7 @@ class Selector extends Component {
             allowClear={allowClear}
             dropdownStyle={dropdownStyle}
             optionFilterProp={optionFilterProp}
+            size={size}
             onSearch={val => onSearch && onSearch(val)}
             onChange={this.triggerChange}
           >
