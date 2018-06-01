@@ -93,9 +93,8 @@ export const getRouterData = app => {
       ),
     },
     '/purchase/order': {
-      component: dynamicWrapper(app, ['goodsType', 'goodsTypeAttribute'], () =>
-        import('../routes/Purchase/Order')
-      ),
+      component: dynamicWrapper(app, ['purchaseOrder'], () => import('../routes/Purchase/Order')),
+      name: '采购订单',
     },
     '/purchase/supplier': {
       component: dynamicWrapper(app, ['businessRelatedUnit'], () =>

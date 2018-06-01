@@ -1,7 +1,7 @@
 import { query, getOne, save, remove } from '../services/purchaseOrder';
 
 export default {
-  namespace: 'goodsType',
+  namespace: 'purchaseOrder',
 
   state: {
     data: {
