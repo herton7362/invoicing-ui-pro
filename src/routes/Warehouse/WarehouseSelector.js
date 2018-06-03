@@ -6,9 +6,9 @@ import debounce from 'lodash/debounce';
 import { Selector } from 'components/DropdownSelector';
 import Form from './Form';
 
-@connect(({ businessRelatedUnit, loading }) => ({
-  businessRelatedUnit,
-  loading: loading.models.businessRelatedUnit,
+@connect(({ warehouse, loading }) => ({
+  warehouse,
+  loading: loading.models.warehouse,
 }))
 export default class GoodsTypeSelector extends Component {
   constructor() {
@@ -55,7 +55,7 @@ export default class GoodsTypeSelector extends Component {
   handleSearch = name => {
     const { dispatch, value } = this.props;
     return dispatch({
-      type: 'businessRelatedUnit/fetch',
+      type: 'warehouse/fetch',
       payload: {
         logicallyDeleted: 0,
         pageSize: 7,
@@ -74,7 +74,7 @@ export default class GoodsTypeSelector extends Component {
 
   handleOpenAddModal = () => {
     this.props.dispatch({
-      type: 'businessRelatedUnit/saveForm',
+      type: 'warehouse/saveForm',
       payload: {},
     });
     this.handleModalVisible(true);
@@ -83,7 +83,7 @@ export default class GoodsTypeSelector extends Component {
   handleOpenEditModal = id => {
     this.props
       .dispatch({
-        type: 'businessRelatedUnit/fetchOne',
+        type: 'warehouse/fetchOne',
         payload: { id },
       })
       .then(() => this.handleModalVisible(true));
@@ -94,7 +94,7 @@ export default class GoodsTypeSelector extends Component {
       dispatch,
       allowClear = true,
       showHandler = true,
-      businessRelatedUnit: { data: { list } },
+      warehouse: { data: { list } },
       loading,
       ...rest
     } = this.props;
@@ -116,7 +116,7 @@ export default class GoodsTypeSelector extends Component {
           showHandler={showHandler}
           loading={loading}
           data={list}
-          placeholder="请选择一个供应商"
+          placeholder="请选择一个仓库"
           dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
           onSearch={this.handleSearch}
           onAdd={this.handleOpenAddModal}

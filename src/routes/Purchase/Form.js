@@ -2,15 +2,23 @@ import React, { PureComponent } from 'react';
 
 import { connect } from 'dva/index';
 import { routerRedux } from 'dva/router';
-import { Card, Form, Button, Input, Popover, Icon } from 'antd';
+import { Card, Form, Button, DatePicker, Input, Popover, Icon } from 'antd';
 import FooterToolbar from 'components/FooterToolbar';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import SupplierSelector from '../Supplier/SupplierSelector';
+import WarehouseSelector from '../Warehouse/WarehouseSelector';
+import Skus from './Skus';
 
 import styles from './Form.less';
 
 const FormItem = Form.Item;
+const { TextArea } = Input;
 
-const fieldLabels = {};
+const fieldLabels = {
+  businessRelatedUnitId: '供应商',
+  deliveryDate: '交货日期',
+  warehouseId: '仓库',
+};
 
 @connect(({ purchaseOrder, loading }) => ({
   purchaseOrder,
@@ -21,8 +29,23 @@ const fieldLabels = {};
     const { purchaseOrder: { formData } } = props;
 
     return {
+      businessRelatedUnitId: Form.createFormField({
+        value: formData.businessRelatedUnitId,
+      }),
       operator: Form.createFormField({
         value: formData.operator,
+      }),
+      deliveryDate: Form.createFormField({
+        value: formData.deliveryDate,
+      }),
+      warehouseId: Form.createFormField({
+        value: formData.warehouseId,
+      }),
+      remark: Form.createFormField({
+        value: formData.remark,
+      }),
+      purchaseOrderSkus: Form.createFormField({
+        value: formData.purchaseOrderSkus,
       }),
     };
   },
@@ -156,20 +179,70 @@ export default class GoodsForm extends PureComponent {
       <PageHeaderLayout>
         <div>
           <Form>
-            <Card style={{ marginTop: 8 }} bordered={false} title="通用信息">
+            <Card style={{ marginTop: 8 }} bordered={false} title="订单信息">
               <FormItem
                 {...formItemLayout}
-                label="内部分类"
-                extra="内部类别用于内部使用，与系统业务无关"
+                label="供应商"
+                extra="可根据选择的商品自动填充"
               >
-                {getFieldDecorator('goodsCategoryId', {
+                {getFieldDecorator('businessRelatedUnitId', {
                   rules: [
                     {
                       required: true,
-                      message: '请选择一个商品分类',
+                      message: '请选择一个供应商',
                     },
                   ],
-                })(<Input />)}
+                })(<SupplierSelector style={{ width: 300 }} />)}
+              </FormItem>
+              <FormItem
+                {...formItemLayout}
+                label="交货日期"
+              >
+                {getFieldDecorator('deliveryDate', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请选择交货日期',
+                    },
+                  ],
+                })(<DatePicker />)}
+              </FormItem>
+              <FormItem
+                {...formItemLayout}
+                label="交货到"
+              >
+                {getFieldDecorator('warehouseId', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请选择交货仓库',
+                    },
+                  ],
+                })(<WarehouseSelector style={{ width: 300 }} />)}
+              </FormItem>
+              <FormItem {...formItemLayout} label="附加说明">
+                {getFieldDecorator('remark')(
+                  <TextArea style={{ minHeight: 32 }} placeholder="你可以填写一个附加说明" rows={4} />
+                )}
+              </FormItem>
+            </Card>
+
+            <Card style={{ marginTop: 24 }} bordered={false} title="商品信息">
+              <FormItem
+                labelCol={{
+                  xs: { span: 24 },
+                  sm: { span: 3 },
+                }}
+                wrapperCol={{
+                  xs: { span: 24 },
+                  sm: { span: 21 },
+                  md: { span: 19 },
+                }}
+                label="商品sku"
+              >
+                {getFieldDecorator('purchaseOrderSkus')(
+                  <Skus />
+                )}
               </FormItem>
             </Card>
 

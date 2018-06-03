@@ -1,7 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva/index';
 import { Card, Form, message, Divider, Popconfirm, Input, Button, Table } from 'antd';
-
+import { routerRedux } from 'dva/router';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
 import styles from './Order.less';
@@ -53,9 +53,13 @@ export default class OrderList extends PureComponent {
     this.handleSearch(params);
   };
 
-  handleOpenAddPage = () => {};
+  handleOpenAddPage = () => {
+    this.props.dispatch(routerRedux.push('/purchase/add'));
+  };
 
-  handleOpenEditPage = id => {};
+  handleOpenEditPage = id => {
+    this.props.dispatch(routerRedux.push(`/purchase/edit/${id}`));
+  };
 
   handleRemove = id => {
     this.props.dispatch({
@@ -82,6 +86,18 @@ export default class OrderList extends PureComponent {
       {
         title: '预订交货日期',
         dataIndex: 'deliveryDate',
+      },
+      {
+        title: '交货到',
+        dataIndex: 'warehouseId',
+      },
+      {
+        title: '供应商',
+        dataIndex: 'businessRelatedUnitId',
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
       },
       {
         title: '操作',
