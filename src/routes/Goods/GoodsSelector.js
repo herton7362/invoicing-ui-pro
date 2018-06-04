@@ -1,12 +1,10 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 import { connect } from 'dva/index';
-import { Button, Dropdown, Icon, Menu } from 'antd';
+import { Select, Spin } from 'antd';
 import debounce from 'lodash/debounce';
 
-import styles from './GoodsSkuSelector.less';
-
-const MenuItem = Menu.Item;
+const { Option } = Select;
 
 @connect(({ goods, loading }) => ({
   goods,
@@ -55,10 +53,6 @@ export default class GoodsTypeSelector extends Component {
     });
   };
 
-  handleSelect = id => {
-    this.triggerChange(id);
-  }
-
   render() {
     const {
       dispatch,
@@ -68,33 +62,22 @@ export default class GoodsTypeSelector extends Component {
     } = this.props;
     const { value } = this.state;
 
-    const getName = id => {
-      if(list) {
-        const one = list.find(data => data.id === id);
-        if(one) {
-          return one.name;
-        }
-      }
-      return '';
-    }
-
-    const menu = (
-      <Menu onClick={({ key }) => this.handleSelect(key)}>
-        {list.map(data => (
-          <MenuItem key={data.id}>{data.name}</MenuItem>
-        ))}
-      </Menu>
-    );
 
     return (
-      <Fragment>
-        <div {...rest}>
-          <span className={styles.label}>{getName(value)}</span>
-          <Dropdown overlay={menu}>
-            <Button size="small">选择 <Icon type="down" /></Button>
-          </Dropdown>
-        </div>
-      </Fragment>
+      <Select
+        value={value}
+        placeholder="请选择商品"
+        optionFilterProp="children"
+        onSearch={this.handleSearch}
+        notFoundContent={loading ? <Spin size="small" /> : null}
+        showSearch
+        onChange={this.triggerChange}
+        {...rest}
+      >
+        {list.map(data => (
+          <Option key={data.id} value={data.id}>{data.name}</Option>
+        ))}
+      </Select>
     );
   }
 }

@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from 'react';
 
-import {connect} from "dva/index";
 import { Table, InputNumber, Popconfirm } from 'antd';
-import GoodsSkuSelector from '../Goods/GoodsSkuSelector';
+import GoodsSelector from '../Goods/GoodsSelector';
+import AttributeTagSelector from '../Goods/type/AttributeTagSelector';
 
 export default class GoodsTypeSelector extends Component {
   state = {
@@ -28,7 +28,7 @@ export default class GoodsTypeSelector extends Component {
         ...value,
         {
           key: index,
-          skuId: null,
+          goodsId: null,
           count: 0,
           price: 0,
           sumPrice: 0,
@@ -42,27 +42,15 @@ export default class GoodsTypeSelector extends Component {
     const { value = [] } = this.state;
     const list = value.map((val, i) => (i === rowIndex ? Object.assign(
       val,
-      {
-        sumPrice: (record.count || val.count) * (record.price || val.price),
-        price: val.price || record.price || 0,
-      },
       record
     ) : val));
 
-    if (list[rowIndex].skuId) {
+    if (list[rowIndex].goodsId) {
       this.triggerChange(list);
     } else {
       this.setState({ value: list });
     }
   };
-
-  handerSaveSku = (rowIndex, record) => {
-    const {
-      goods: { list },
-    } = this.props;
-    const one = list.find(data => data.id === record.skuId);
-    this.handerSaveRow(rowIndex, one? Object.assign(record, {price: one.price}): record);
-  }
 
   handleRemove = index => {
     const { value = [] } = this.state;
@@ -75,12 +63,16 @@ export default class GoodsTypeSelector extends Component {
     const columns = [
       {
         title: '商品',
-        dataIndex: 'skuId',
+        dataIndex: 'goodsId',
         render: (val, record, index) => (
-          <GoodsSkuSelector
-            value={val}
-            onChange={v => this.handerSaveSku(index, { skuId: v })}
-          />
+          <Fragment>
+            <GoodsSelector
+              size="small"
+              value={val}
+              onChange={v => this.handerSaveRow(index, { goodsId: v })}
+            />
+            <AttributeTagSelector style={{marginTop: '8px'}} />
+          </Fragment>
         ),
       },
       {
@@ -144,7 +136,7 @@ export default class GoodsTypeSelector extends Component {
           columns={columns}
           size="small"
         />
-        <a onClick={this.handleAddRow}>添加供应商</a>
+        <a onClick={this.handleAddRow}>添加商品</a>
       </Fragment>
     );
   }
