@@ -1,12 +1,18 @@
 import React, { Component } from 'react';
 
 import { Table, Input, InputNumber } from 'antd';
-import { connect } from 'dva/index';
+import PropTypes from "prop-types";
 
-@connect(({ goodsTypeAttribute }) => ({
-  goodsTypeAttribute,
-}))
 export default class GoodsSkus extends Component {
+  static defaultProps = {
+    goodsAttributes: [],
+  };
+
+  static propTypes = {
+    goodsTypeAttributes: PropTypes.array.isRequired,
+    goodsAttributes: PropTypes.array,
+  };
+
   state = {
     dataSource: null,
   };
@@ -175,7 +181,7 @@ export default class GoodsSkus extends Component {
   };
 
   render() {
-    const { goodsTypeAttribute: { data: { list: goodsTypeAttributes = [] } } } = this.props;
+    const { goodsTypeAttributes } = this.props;
     const { dataSource } = this.state;
 
     const columns = [

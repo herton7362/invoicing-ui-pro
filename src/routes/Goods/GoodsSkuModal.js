@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva/index';
 import { Form, Modal, Button } from 'antd';
 
-import GoodsSkus from './GoodsSkus';
+import GoodsSkus from './sku/GoodsSkus';
 
 @connect(({ goods, goodsCategory, goodsTypeAttribute, loading }) => ({
   goods,

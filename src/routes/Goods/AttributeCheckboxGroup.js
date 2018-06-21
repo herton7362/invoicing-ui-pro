@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
-import { connect } from 'dva';
 import { Checkbox, Form } from 'antd';
+import PropTypes from "prop-types";
 
 const FormItem = Form.Item;
 const CheckboxGroup = Checkbox.Group;
 
 // 属性checkbox组，允许checkbox将对象作为值
-@connect(({ goodsTypeAttribute }) => ({
-  goodsTypeAttribute,
-}))
 export default class AttributeCheckboxGroup extends Component {
+  static propTypes = {
+    goodsTypeAttributes: PropTypes.array.isRequired,
+  };
+
   state = {
     value: null,
   };
@@ -28,7 +29,7 @@ export default class AttributeCheckboxGroup extends Component {
 
   render() {
     const {
-      goodsTypeAttribute: { data: { list: goodsTypeAttributeList = [] } },
+      goodsTypeAttributes,
       labelCol,
       wrapperCol,
     } = this.props;
@@ -36,7 +37,7 @@ export default class AttributeCheckboxGroup extends Component {
 
     return (
       <div>
-        {goodsTypeAttributeList.map(attr => (
+        {goodsTypeAttributes.map(attr => (
           <FormItem key={attr.id} labelCol={labelCol} wrapperCol={wrapperCol} label={attr.name}>
             <CheckboxGroup
               value={

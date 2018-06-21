@@ -38,7 +38,7 @@ export default class GoodsTypeSelector extends Component {
     }));
   };
 
-  handerSaveRow = (rowIndex, record) => {
+  handleSaveRow = (rowIndex, record) => {
     const { value = [] } = this.state;
     const list = value.map((val, i) => (i === rowIndex ? Object.assign(
       val,
@@ -69,7 +69,7 @@ export default class GoodsTypeSelector extends Component {
             <GoodsSelector
               size="small"
               value={val}
-              onChange={v => this.handerSaveRow(index, { goodsId: v })}
+              onChange={v => this.handleSaveRow(index, { goodsId: v })}
             />
             <AttributeTagSelector style={{marginTop: '8px'}} />
           </Fragment>
@@ -85,7 +85,7 @@ export default class GoodsTypeSelector extends Component {
             size="small"
             value={val}
             style={{ width: '100%' }}
-            onChange={v => this.handerSaveRow(index, { count: v })}
+            onChange={v => this.handleSaveRow(index, { count: v })}
           />
         ),
       },
@@ -99,7 +99,7 @@ export default class GoodsTypeSelector extends Component {
             size="small"
             value={val}
             style={{ width: '100%' }}
-            onChange={v => this.handerSaveRow(index, { price: v })}
+            onChange={v => this.handleSaveRow(index, { price: v })}
           />
         ),
       },

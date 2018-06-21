@@ -9,7 +9,7 @@ import numeral from 'numeral';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import CategorySelector from './category/CategorySelector';
 import GoodsTypeSelector from './type/GoodsTypeSelector';
-import GoodsSkus from './GoodsSkus';
+import GoodsSkus from './sku/GoodsSkus';
 import Cover from './Cover';
 import AttributeCheckboxGroup from './AttributeCheckboxGroup';
 import SupplierSelectTable from './SupplierSelectTable';
@@ -183,7 +183,7 @@ export default class GoodsForm extends PureComponent {
   };
 
   render() {
-    const { submitting, goods: { formData } } = this.props;
+    const { submitting, goods: { formData }, goodsTypeAttribute: { data: { list: goodsTypeAttributes = [] } } } = this.props;
     const { getFieldDecorator, setFieldsValue, getFieldsError } = this.props.form;
 
     const errors = getFieldsError();
@@ -318,7 +318,9 @@ export default class GoodsForm extends PureComponent {
                   getValueFromEvent: this.handleLoadAttributes,
                 })(<GoodsTypeSelector style={{ width: 300 }} />)}
               </FormItem>
-              {getFieldDecorator('goodsAttributes')(<AttributeCheckboxGroup {...formItemLayout} />)}
+              {getFieldDecorator('goodsAttributes')(
+                <AttributeCheckboxGroup {...formItemLayout} goodsTypeAttributes={goodsTypeAttributes} />
+              )}
               <FormItem
                 labelCol={{
                   xs: { span: 24 },
@@ -332,7 +334,7 @@ export default class GoodsForm extends PureComponent {
                 label="商品sku"
               >
                 {getFieldDecorator('goodsSkus')(
-                  <GoodsSkus goodsAttributes={formData.goodsAttributes} />
+                  <GoodsSkus goodsAttributes={formData.goodsAttributes} goodsTypeAttributes={goodsTypeAttributes} />
                 )}
               </FormItem>
             </Card>
