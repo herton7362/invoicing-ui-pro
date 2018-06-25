@@ -3,10 +3,12 @@ import React, { Component, Fragment } from 'react';
 import { Table, InputNumber, Popconfirm } from 'antd';
 import GoodsSelector from '../Goods/GoodsSelector';
 import AttributeTagSelector from '../Goods/type/AttributeTagSelector';
+import GoodsSkuSelector from '../Goods/sku/GoodsSkuSelector';
 
 export default class GoodsTypeSelector extends Component {
   state = {
     value: [],
+    modalVisible: false,
   };
 
   componentWillReceiveProps(nextProps) {
@@ -23,19 +25,7 @@ export default class GoodsTypeSelector extends Component {
   };
 
   handleAddRow = () => {
-    this.setState(({ value = [], index = 0 }) => ({
-      value: [
-        ...value,
-        {
-          key: index,
-          goodsId: null,
-          count: 0,
-          price: 0,
-          sumPrice: 0,
-        },
-      ],
-      index: index + 1,
-    }));
+    this.setState({ modalVisible: true });
   };
 
   handleSaveRow = (rowIndex, record) => {
@@ -59,7 +49,7 @@ export default class GoodsTypeSelector extends Component {
   };
 
   render() {
-    const { value } = this.state;
+    const { value, modalVisible } = this.state;
     const columns = [
       {
         title: '商品',
@@ -137,6 +127,7 @@ export default class GoodsTypeSelector extends Component {
           size="small"
         />
         <a onClick={this.handleAddRow}>添加商品</a>
+        <GoodsSkuSelector modalVisible={modalVisible} />
       </Fragment>
     );
   }
