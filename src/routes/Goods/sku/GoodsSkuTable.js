@@ -1,8 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+
+import { Table } from 'antd';
 import PropTypes from 'prop-types';
 
 // 可根据传入的attribute来生成对应的sku，并且返回新的value
-export default class GoodsSkuProducer extends Component {
+export default class GoodsSkuTable extends Component {
   static defaultProps = {
     value: [],
     valueChangeFilter: changedValue => changedValue,
@@ -21,9 +23,9 @@ export default class GoodsSkuProducer extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    const { value, goodsAttributes } = nextProps;
+    const { value, goodsAttributes, valueChangeFilter } = nextProps;
     const dataSource = this.getSkusByGoodsAttributes(goodsAttributes, value);
-    this.setState({ dataSource });
+    this.setState({ dataSource: valueChangeFilter(dataSource) });
   }
 
   getGoodsAttrCombo = attrs => {
@@ -95,14 +97,13 @@ export default class GoodsSkuProducer extends Component {
       );
     };
 
-    const addExtraProps = (source, target) => {
-      return target.map(targetRow =>
+    const addExtraProps = (source, target) =>
+      target.map(targetRow =>
         Object.assign(
           targetRow,
           source.find(sourceRow => goodsAttributesMatch(sourceRow, targetRow))
         )
       );
-    };
 
     if (value) {
       const attrInValue = value.map(addGoodsAttributes);
@@ -188,10 +189,9 @@ export default class GoodsSkuProducer extends Component {
       goodsAttributes,
       goodsTypeAttributes,
       columns,
-      valueChangeFilter,
       ...restProps } = this.props;
     const { dataSource } = this.state;
-    valueChangeFilter(dataSource);
+
     const tableColumns = columns(dataSource);
 
     tableColumns.unshift(
@@ -203,14 +203,18 @@ export default class GoodsSkuProducer extends Component {
     );
 
     return (
-      <div {...restProps}>
-        {goodsTypeAttributes.length > 0 && React.cloneElement(children, {
-          rowKey: record => `${goodsTypeAttributes.map(attr => record[attr.id])}`,
-          dataSource,
-          columns: tableColumns,
-          onChange: this.triggerChange,
-        })}
-      </div>
+      <Fragment>
+        {goodsTypeAttributes.length > 0 &&
+        (
+          <Table
+            rowKey={record => `${goodsTypeAttributes.map(attr => record[attr.id])}`}
+            dataSource={dataSource}
+            columns={tableColumns}
+            onChange={this.triggerChange}
+            {...restProps}
+          />
+        )}
+      </Fragment>
     );
   }
 }

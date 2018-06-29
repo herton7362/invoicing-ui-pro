@@ -1,8 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
-import { Table, InputNumber, Popconfirm } from 'antd';
-import GoodsSelector from '../Goods/GoodsSelector';
-import AttributeTagSelector from '../Goods/type/AttributeTagSelector';
+import { Table, Popconfirm, message } from 'antd';
 import GoodsSkuSelector from '../Goods/sku/GoodsSkuSelector';
 
 export default class GoodsTypeSelector extends Component {
@@ -18,6 +16,13 @@ export default class GoodsTypeSelector extends Component {
     }
   }
 
+  onGoodsSkuSelected = (goods, goodsSkus) => {
+    this.triggerChange(goodsSkus.map(goodsSku => Object.assign(goodsSku, {
+      goods: Object.assign(goods, {rowSpan: goodsSkus.length}),
+    })))
+    message.success('保存成功');
+  };
+
   triggerChange = changedValue => {
     const { onChange } = this.props;
     if (!('value' in this.props)) this.setState({ value: changedValue });
@@ -28,70 +33,37 @@ export default class GoodsTypeSelector extends Component {
     this.setState({ modalVisible: true });
   };
 
-  handleSaveRow = (rowIndex, record) => {
-    const { value = [] } = this.state;
-    const list = value.map((val, i) => (i === rowIndex ? Object.assign(
-      val,
-      record
-    ) : val));
-
-    if (list[rowIndex].goodsId) {
-      this.triggerChange(list);
-    } else {
-      this.setState({ value: list });
-    }
+  handleModalVisible = flag => {
+    this.setState({
+      modalVisible: !!flag,
+    });
   };
 
-  handleRemove = index => {
-    const { value = [] } = this.state;
-    value.splice(index, 1);
-    this.setState({ value });
-  };
 
   render() {
     const { value, modalVisible } = this.state;
     const columns = [
       {
         title: '商品',
-        dataIndex: 'goodsId',
-        render: (val, record, index) => (
-          <Fragment>
-            <GoodsSelector
-              size="small"
-              value={val}
-              onChange={v => this.handleSaveRow(index, { goodsId: v })}
-            />
-            <AttributeTagSelector style={{marginTop: '8px'}} />
-          </Fragment>
-        ),
+        dataIndex: 'goods.name',
+        render: (v, row) => ({
+          children: v,
+          props: {
+            rowSpan: row.goods.rowSpan,
+          },
+        }),
       },
       {
         title: '数量',
         dataIndex: 'count',
         width: 130,
         align: 'center',
-        render: (val, record, index) => (
-          <InputNumber
-            size="small"
-            value={val}
-            style={{ width: '100%' }}
-            onChange={v => this.handleSaveRow(index, { count: v })}
-          />
-        ),
       },
       {
         title: '单价',
         dataIndex: 'price',
         width: 130,
         align: 'center',
-        render: (val, record, index) => (
-          <InputNumber
-            size="small"
-            value={val}
-            style={{ width: '100%' }}
-            onChange={v => this.handleSaveRow(index, { price: v })}
-          />
-        ),
       },
       {
         title: '金额',
@@ -117,17 +89,23 @@ export default class GoodsTypeSelector extends Component {
       },
     ];
 
+    const parentMethods = {
+      onOk: this.onGoodsSkuSelected,
+      handleModalVisible: this.handleModalVisible,
+      onCancel: this.handleModalVisible,
+    };
+
     return (
       <Fragment>
         <Table
-          rowKey={record => record.businessRelatedUnitId || record.key}
+          rowKey={row => row.id}
           dataSource={value}
           pagination={false}
           columns={columns}
           size="small"
         />
         <a onClick={this.handleAddRow}>添加商品</a>
-        <GoodsSkuSelector modalVisible={modalVisible} />
+        <GoodsSkuSelector {...parentMethods} modalVisible={modalVisible} />
       </Fragment>
     );
   }

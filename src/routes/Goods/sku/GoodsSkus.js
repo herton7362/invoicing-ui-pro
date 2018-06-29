@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Table, Input, InputNumber } from 'antd';
 import PropTypes from "prop-types";
 
-import GoodsSkuProducer from './GoodsSkuProducer';
+import GoodsSkuTable from './GoodsSkuTable';
 
 export default class GoodsSkus extends Component {
   static defaultProps = {
@@ -25,7 +25,7 @@ export default class GoodsSkus extends Component {
 
     return (
       <div>
-        <GoodsSkuProducer
+        <GoodsSkuTable
           value={value}
           goodsAttributes={goodsAttributes}
           goodsTypeAttributes={goodsTypeAttributes}
@@ -83,9 +83,9 @@ export default class GoodsSkus extends Component {
               },
             ];
           }}
-        >
-          <Table size="small" pagination={false} />
-        </GoodsSkuProducer>
+          size="small"
+          pagination={false}
+        />
       </div>
     );
   }

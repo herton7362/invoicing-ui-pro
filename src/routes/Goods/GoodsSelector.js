@@ -62,7 +62,6 @@ export default class GoodsTypeSelector extends Component {
     } = this.props;
     const { value } = this.state;
 
-
     return (
       <Select
         value={value}

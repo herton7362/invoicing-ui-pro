@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 
-import { Table, InputNumber, Modal, Form } from 'antd';
+import { InputNumber, Modal, Form, Button } from 'antd';
 import { connect } from "dva";
 
 import AttributeCheckboxGroup from '../AttributeCheckboxGroup';
 import GoodsSelector from '../GoodsSelector';
-import GoodsSkuProducer from './GoodsSkuProducer';
+import GoodsSkuTable from './GoodsSkuTable';
 
 const FormItem = Form.Item;
 
@@ -39,9 +39,9 @@ export default class GoodsSkus extends Component {
 
   bootGoodsSkusData = goodsSkus => {
     return goodsSkus.map(goodsSku => Object.assign(goodsSku, {
-      price: goodsSku.lastPurchasePrice,
-      count: 0,
-      sumPrice: 0,
+      price: goodsSku.price || goodsSku.lastPurchasePrice,
+      count: goodsSku.count || 0,
+      sumPrice: goodsSku.sumPrice || 0,
     }))
   }
 
@@ -65,16 +65,37 @@ export default class GoodsSkus extends Component {
     }
   };
 
-  triggerChange = changedValue => {
-    const { onChange } = this.props;
-    this.setState({goodsSkus: changedValue});
-    if (onChange) onChange(changedValue);
-  };
+  handleOk = () => {
+    const {
+      onOk,
+      handleModalVisible,
+      goods: { list },
+    } = this.props;
+
+    const { goodsId, goodsSkus } = this.state;
+
+    onOk(list.find(row => row.id === goodsId), goodsSkus);
+    this.clearSelected();
+    handleModalVisible();
+  }
+
+  clearSelected = callback => {
+    this.setState({
+      goodsId: undefined,
+      goodsAttributes: [],
+      goodsSkus: [],
+    });
+    if(callback) {
+      callback();
+    }
+  }
 
   render() {
     const {
       modalVisible,
       goodsTypeAttribute: { data: { list: goodsTypeAttributes = [] } },
+      handleModalVisible,
+      onCancel,
     } = this.props;
 
     const { goodsId, goodsAttributes, goodsSkus } = this.state;
@@ -90,11 +111,86 @@ export default class GoodsSkus extends Component {
       },
     };
 
+    const columns = currentDataSource => [
+      {
+        title: '条码',
+        dataIndex: 'barcode',
+        align: 'center',
+      },
+      {
+        title: '库存数量',
+        dataIndex: 'stockNumber',
+        align: 'center',
+      },
+      {
+        title: '单价',
+        dataIndex: 'price',
+        align: 'center',
+        render: (rowValue, record, index) => (
+          <InputNumber
+            size="small"
+            value={rowValue}
+            onChange={val => {
+              const dataSource = currentDataSource;
+              dataSource[index].price = val;
+              dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
+              this.setState({goodsSkus: dataSource});
+            }}
+            style={{ width: '100px' }}
+          />
+        ),
+      },
+      {
+        title: '数量',
+        dataIndex: 'count',
+        align: 'center',
+        render: (rowValue, record, index) => (
+          <InputNumber
+            size="small"
+            value={rowValue}
+            onChange={val => {
+              const dataSource = currentDataSource;
+              dataSource[index].count = val;
+              dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
+              this.setState({goodsSkus: dataSource});
+            }}
+            style={{ width: '100px' }}
+          />
+        ),
+      },
+      {
+        title: '金额',
+        dataIndex: 'sumPrice',
+        align: 'center',
+        render: (rowValue, record, index) => (
+          <InputNumber
+            size="small"
+            value={rowValue}
+            onChange={val => {
+              const dataSource = currentDataSource;
+              dataSource[index].sumPrice = val;
+              this.setState({goodsSkus: dataSource});
+            }}
+            style={{ width: '100px' }}
+          />
+        ),
+      },
+    ];
+
     return (
       <Modal
         title="商品选择"
         visible={modalVisible}
         width={960}
+        onCancel={() => this.clearSelected(handleModalVisible)}
+        footer={[
+          <Button key="cancel" onClick={() => this.clearSelected(onCancel)}>
+            取消
+          </Button>,
+          <Button key="submit" type="primary" onClick={this.handleOk}>
+            保存
+          </Button>,
+        ]}
       >
         <FormItem {...formItemLayout} label="商品">
           <GoodsSelector
@@ -109,81 +205,16 @@ export default class GoodsSkus extends Component {
           goodsTypeAttributes={goodsTypeAttributes}
           onChange={changedValue => this.setState({goodsAttributes: changedValue})}
         />
-        <GoodsSkuProducer
+        <GoodsSkuTable
           value={goodsSkus}
           goodsAttributes={goodsAttributes}
           goodsTypeAttributes={goodsTypeAttributes}
           valueChangeFilter={this.bootGoodsSkusData}
-          columns={currentDataSource => {
-            const dataSource = currentDataSource;
-
-            return [
-              {
-                title: '条码',
-                dataIndex: 'barcode',
-                align: 'center',
-              },
-              {
-                title: '库存数量',
-                dataIndex: 'stockNumber',
-                align: 'center',
-              },
-              {
-                title: '单价',
-                dataIndex: 'price',
-                align: 'center',
-                render: (rowValue, record, index) => (
-                  <InputNumber
-                    size="small"
-                    value={rowValue}
-                    onChange={val => {
-                      dataSource[index].price = val;
-                      dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
-                      this.triggerChange(dataSource);
-                    }}
-                    style={{ width: '100px' }}
-                  />
-                ),
-              },
-              {
-                title: '数量',
-                dataIndex: 'count',
-                align: 'center',
-                render: (rowValue, record, index) => (
-                  <InputNumber
-                    size="small"
-                    value={rowValue}
-                    onChange={val => {
-                      dataSource[index].count = val;
-                      dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
-                      this.triggerChange(dataSource);
-                    }}
-                    style={{ width: '100px' }}
-                  />
-                ),
-              },
-              {
-                title: '金额',
-                dataIndex: 'sumPrice',
-                align: 'center',
-                render: (rowValue, record, index) => (
-                  <InputNumber
-                    size="small"
-                    value={rowValue}
-                    onChange={val => {
-                      dataSource[index].sumPrice = val;
-                      this.triggerChange(dataSource);
-                    }}
-                    style={{ width: '100px' }}
-                  />
-                ),
-              },
-            ];
-          }}
+          columns={columns}
           style={{padding: '0 30px'}}
-        >
-          <Table size="small" pagination={false} />
-        </GoodsSkuProducer>
+          size="small"
+          pagination={false}
+        />
       </Modal>
     );
   }
