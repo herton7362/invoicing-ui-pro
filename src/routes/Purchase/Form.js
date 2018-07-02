@@ -44,8 +44,8 @@ const fieldLabels = {
       remark: Form.createFormField({
         value: formData.remark,
       }),
-      purchaseOrderSkus: Form.createFormField({
-        value: formData.purchaseOrderSkus,
+      items: Form.createFormField({
+        value: formData.items,
       }),
     };
   },
@@ -229,7 +229,7 @@ export default class GoodsForm extends PureComponent {
 
             <Card style={{ marginTop: 24 }} bordered={false} title="商品信息">
               <FormItem>
-                {getFieldDecorator('purchaseOrderSkus')(
+                {getFieldDecorator('items')(
                   <Skus />
                 )}
               </FormItem>

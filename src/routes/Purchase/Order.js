@@ -89,11 +89,11 @@ export default class OrderList extends PureComponent {
       },
       {
         title: '交货到',
-        dataIndex: 'warehouseId',
+        dataIndex: 'warehouse.name',
       },
       {
         title: '供应商',
-        dataIndex: 'businessRelatedUnitId',
+        dataIndex: 'businessRelatedUnit.name',
       },
       {
         title: '状态',

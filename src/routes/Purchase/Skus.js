@@ -51,14 +51,14 @@ export default class GoodsTypeSelector extends Component {
       lastGoodsId = row.goodsId;
       return newRow;
     })
-  }
+  };
 
   dataToObject = data => {
     return data.map(row => Object.assign(row, {
       id: null,
       skuId: row.id,
     }))
-  }
+  };
 
   triggerChange = changedValue => {
     const { onChange } = this.props;
@@ -182,7 +182,7 @@ export default class GoodsTypeSelector extends Component {
     return (
       <Fragment>
         <Table
-          rowKey={row => row.id}
+          rowKey={row => row.skuId}
           dataSource={value}
           pagination={false}
           columns={columns}
