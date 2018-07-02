@@ -228,18 +228,7 @@ export default class GoodsForm extends PureComponent {
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="商品信息">
-              <FormItem
-                labelCol={{
-                  xs: { span: 24 },
-                  sm: { span: 3 },
-                }}
-                wrapperCol={{
-                  xs: { span: 24 },
-                  sm: { span: 21 },
-                  md: { span: 19 },
-                }}
-                label="商品sku"
-              >
+              <FormItem>
                 {getFieldDecorator('purchaseOrderSkus')(
                   <Skus />
                 )}

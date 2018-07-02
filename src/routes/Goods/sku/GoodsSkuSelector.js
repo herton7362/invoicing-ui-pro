@@ -69,12 +69,18 @@ export default class GoodsSkus extends Component {
     const {
       onOk,
       handleModalVisible,
+      goodsTypeAttribute: { data: { list: goodsTypeAttributes = [] } },
       goods: { list },
     } = this.props;
 
     const { goodsId, goodsSkus } = this.state;
+    const attributeNameFormat = sku => goodsTypeAttributes.map(attr => `${attr.name}：${sku[attr.id]}`).join('，');
+    const resultFormat = result => result.map(sku => Object.assign(sku, {
+      goods: Object.assign({}, list.find(row => row.id === goodsId)),
+      attributeName: attributeNameFormat(sku),
+    }))
 
-    onOk(list.find(row => row.id === goodsId), goodsSkus);
+    onOk(resultFormat(goodsSkus));
     this.clearSelected();
     handleModalVisible();
   }
@@ -148,6 +154,7 @@ export default class GoodsSkus extends Component {
           <InputNumber
             size="small"
             value={rowValue}
+            min={0}
             onChange={val => {
               const dataSource = currentDataSource;
               dataSource[index].count = val;
