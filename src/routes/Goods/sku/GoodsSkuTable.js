@@ -56,18 +56,31 @@ export default class GoodsSkuTable extends Component {
     });
 
     const attrCombo = this.getGoodsAttrCombo(attrGroup);
-    const addGoodsAttributes = attr =>
-      attr.goodsAttributes
-        ? attr
-        : Object.assign(attr, {
-          goodsAttributes: Object.keys(attr)
-            .filter(key =>
-              goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key)
-            )
-            .sort()
-            .map(key => `${key}:${attr[key]}`)
-            .join(','),
-        });
+    const addGoodsAttributes = attr => attr.goodsAttributes
+      ? attr
+      : Object.assign(attr, {
+        goodsAttributes: Object.keys(attr)
+          .filter(key =>
+            goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key)
+          )
+          .sort().map(key => `${key}:${attr[key]}`).join(','),
+      })
+
+    const addGoodsAttributeIds = attr => attr.goodsAttributeIds
+      ? attr
+      : Object.assign(attr, {
+        goodsAttributeIds: Object.keys(attr)
+          .filter(key =>
+            goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key)
+          )
+          .sort()
+          .map(key =>
+            goodsAttributes.find(goodsAttribute =>
+              goodsAttribute.goodsTypeAttributeId === key
+              && goodsAttribute.goodsTypeAttributeValue === attr[key]).id).join(','),
+      });
+
+    const addGoodsExtraParams = attr => addGoodsAttributeIds(addGoodsAttributes(attr));
 
     const result = attrCombo
       .map(group =>
@@ -79,7 +92,7 @@ export default class GoodsSkuTable extends Component {
           }))
           .reduce((x, y) => Object.assign(x, y))
       )
-      .map(addGoodsAttributes);
+      .map(addGoodsExtraParams);
 
     const goodsAttributesMatch = (sku1, sku2) => {
       return (
@@ -106,7 +119,7 @@ export default class GoodsSkuTable extends Component {
       );
 
     if (value) {
-      const attrInValue = value.map(addGoodsAttributes);
+      const attrInValue = value.map(addGoodsExtraParams);
 
       if (compareSkuChanged(result, attrInValue)) {
         this.triggerChange(addExtraProps(attrInValue, result));
