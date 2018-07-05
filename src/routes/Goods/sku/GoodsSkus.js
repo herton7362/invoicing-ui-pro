@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { Input, InputNumber } from 'antd';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 
 import GoodsSkuTable from './GoodsSkuTable';
 

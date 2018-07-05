@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Checkbox, Form } from 'antd';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 
 const FormItem = Form.Item;
 const CheckboxGroup = Checkbox.Group;
@@ -28,11 +28,7 @@ export default class AttributeCheckboxGroup extends Component {
   };
 
   render() {
-    const {
-      goodsTypeAttributes,
-      labelCol,
-      wrapperCol,
-    } = this.props;
+    const { goodsTypeAttributes, labelCol, wrapperCol } = this.props;
     const { value } = this.state;
 
     return (

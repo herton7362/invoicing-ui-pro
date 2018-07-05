@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { InputNumber, Modal, Form, Button } from 'antd';
-import { connect } from "dva";
+import { connect } from 'dva';
 
 import AttributeCheckboxGroup from '../AttributeCheckboxGroup';
 import GoodsSelector from '../GoodsSelector';
@@ -19,7 +19,7 @@ export default class GoodsSkus extends Component {
     goodsId: undefined,
     goodsAttributes: [],
     goodsSkus: [],
-  }
+  };
 
   onSelectGoods = goodsId => {
     const { dispatch } = this.props;
@@ -35,15 +35,17 @@ export default class GoodsSkus extends Component {
         this.handleLoadAttributes(response.goodsTypeId);
       },
     });
-  }
+  };
 
   bootGoodsSkusData = goodsSkus => {
-    return goodsSkus.map(goodsSku => Object.assign(goodsSku, {
-      price: goodsSku.price || goodsSku.lastPurchasePrice,
-      count: goodsSku.count || 0,
-      sumPrice: goodsSku.sumPrice || 0,
-    }))
-  }
+    return goodsSkus.map(goodsSku =>
+      Object.assign(goodsSku, {
+        price: goodsSku.price || goodsSku.lastPurchasePrice,
+        count: goodsSku.count || 0,
+        sumPrice: goodsSku.sumPrice || 0,
+      })
+    );
+  };
 
   handleLoadAttributes = goodsTypeId => {
     const { dispatch } = this.props;
@@ -74,16 +76,20 @@ export default class GoodsSkus extends Component {
     } = this.props;
 
     const { goodsId, goodsSkus } = this.state;
-    const attributeNameFormat = sku => goodsTypeAttributes.map(attr => `${attr.name}：${sku[attr.id]}`).join('，');
-    const resultFormat = result => result.map(sku => Object.assign(sku, {
-      goods: Object.assign({}, list.find(row => row.id === goodsId)),
-      attributeName: attributeNameFormat(sku),
-    }))
+    const attributeNameFormat = sku =>
+      goodsTypeAttributes.map(attr => `${attr.name}：${sku[attr.id]}`).join('，');
+    const resultFormat = result =>
+      result.map(sku =>
+        Object.assign(sku, {
+          goods: Object.assign({}, list.find(row => row.id === goodsId)),
+          attributeName: attributeNameFormat(sku),
+        })
+      );
 
     onOk(resultFormat(goodsSkus));
     this.clearSelected();
     handleModalVisible();
-  }
+  };
 
   clearSelected = callback => {
     this.setState({
@@ -91,10 +97,10 @@ export default class GoodsSkus extends Component {
       goodsAttributes: [],
       goodsSkus: [],
     });
-    if(callback) {
+    if (callback) {
       callback();
     }
-  }
+  };
 
   render() {
     const {
@@ -140,7 +146,7 @@ export default class GoodsSkus extends Component {
               const dataSource = currentDataSource;
               dataSource[index].price = val;
               dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
-              this.setState({goodsSkus: dataSource});
+              this.setState({ goodsSkus: dataSource });
             }}
             style={{ width: '100px' }}
           />
@@ -159,7 +165,7 @@ export default class GoodsSkus extends Component {
               const dataSource = currentDataSource;
               dataSource[index].count = val;
               dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
-              this.setState({goodsSkus: dataSource});
+              this.setState({ goodsSkus: dataSource });
             }}
             style={{ width: '100px' }}
           />
@@ -176,7 +182,7 @@ export default class GoodsSkus extends Component {
             onChange={val => {
               const dataSource = currentDataSource;
               dataSource[index].sumPrice = val;
-              this.setState({goodsSkus: dataSource});
+              this.setState({ goodsSkus: dataSource });
             }}
             style={{ width: '100px' }}
           />
@@ -200,17 +206,13 @@ export default class GoodsSkus extends Component {
         ]}
       >
         <FormItem {...formItemLayout} label="商品">
-          <GoodsSelector
-            value={goodsId}
-            onChange={this.onSelectGoods}
-            style={{ width: '250px' }}
-          />
+          <GoodsSelector value={goodsId} onChange={this.onSelectGoods} style={{ width: '250px' }} />
         </FormItem>
         <AttributeCheckboxGroup
           {...formItemLayout}
           value={goodsAttributes}
           goodsTypeAttributes={goodsTypeAttributes}
-          onChange={changedValue => this.setState({goodsAttributes: changedValue})}
+          onChange={changedValue => this.setState({ goodsAttributes: changedValue })}
         />
         <GoodsSkuTable
           value={goodsSkus}
@@ -218,7 +220,7 @@ export default class GoodsSkus extends Component {
           goodsTypeAttributes={goodsTypeAttributes}
           valueChangeFilter={this.bootGoodsSkusData}
           columns={columns}
-          style={{padding: '0 30px'}}
+          style={{ padding: '0 30px' }}
           size="small"
           pagination={false}
         />

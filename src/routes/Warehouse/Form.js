@@ -76,12 +76,7 @@ export default class BusinessRelatedUnitForm extends PureComponent {
   };
 
   handleRemove = () => {
-    const {
-      onSaveSuccess,
-      handleModalVisible,
-      dispatch,
-      warehouse: { formData },
-    } = this.props;
+    const { onSaveSuccess, handleModalVisible, dispatch, warehouse: { formData } } = this.props;
     dispatch({
       type: 'warehouse/remove',
       payload: {

@@ -22,17 +22,24 @@ export default class GoodsTypeSelector extends Component {
     const matchedRows = value.filter(row1 => goodsSkus.some(row2 => row2.id === row1.id));
     const restRows = goodsSkus.filter(row1 => matchedRows.every(row2 => row2.id !== row1.id));
     const increaseCount = rows => {
-      rows.forEach(row => Object.assign(row, {
-        count: row.count + goodsSkus.find(sku => sku.id === row.id).count,
-      }))
-    }
+      rows.forEach(row =>
+        Object.assign(row, {
+          count: row.count + goodsSkus.find(sku => sku.id === row.id).count,
+        })
+      );
+    };
     const appendNewSkus = rows => {
-      value.push(...rows.map(( goodsSku, index ) => Object.assign(goodsSku, {
-        goods: Object.assign(goodsSku.goods, { rowSpan: index === 0 ? rows.length : 0 }),
-      })));
-    }
-    const groupByGoods = result => result.sort((row1, row2) => row1.goodsId === row2.goodsId ? 0 : -1)
-    const filter = result => [...result.filter(row => row.count > 0)]
+      value.push(
+        ...rows.map((goodsSku, index) =>
+          Object.assign(goodsSku, {
+            goods: Object.assign(goodsSku.goods, { rowSpan: index === 0 ? rows.length : 0 }),
+          })
+        )
+      );
+    };
+    const groupByGoods = result =>
+      result.sort((row1, row2) => (row1.goodsId === row2.goodsId ? 0 : -1));
+    const filter = result => [...result.filter(row => row.count > 0)];
 
     increaseCount(matchedRows);
     appendNewSkus(restRows);
@@ -45,19 +52,24 @@ export default class GoodsTypeSelector extends Component {
     return result.map(row => {
       const newRow = Object.assign(row, {
         goods: Object.assign(row.goods, {
-          rowSpan: lastGoodsId !== row.goodsId ? result.filter(tmp => tmp.goodsId === row.goodsId).length : 0,
+          rowSpan:
+            lastGoodsId !== row.goodsId
+              ? result.filter(tmp => tmp.goodsId === row.goodsId).length
+              : 0,
         }),
       });
       lastGoodsId = row.goodsId;
       return newRow;
-    })
+    });
   };
 
   dataToObject = data => {
-    return data.map(row => Object.assign(row, {
-      id: null,
-      skuId: row.id,
-    }))
+    return data.map(row =>
+      Object.assign(row, {
+        id: null,
+        skuId: row.id,
+      })
+    );
   };
 
   triggerChange = changedValue => {
@@ -83,7 +95,6 @@ export default class GoodsTypeSelector extends Component {
       modalVisible: !!flag,
     });
   };
-
 
   render() {
     const { value, modalVisible } = this.state;
@@ -116,7 +127,7 @@ export default class GoodsTypeSelector extends Component {
               const dataSource = value;
               dataSource[index].price = val;
               dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
-              this.setState({value: dataSource});
+              this.setState({ value: dataSource });
               this.triggerChange(dataSource);
             }}
             style={{ width: '100px' }}
@@ -137,7 +148,7 @@ export default class GoodsTypeSelector extends Component {
               const dataSource = value;
               dataSource[index].count = val;
               dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
-              this.setState({value: dataSource});
+              this.setState({ value: dataSource });
               this.triggerChange(dataSource);
             }}
             style={{ width: '100px' }}
@@ -156,7 +167,7 @@ export default class GoodsTypeSelector extends Component {
             onChange={val => {
               const dataSource = value;
               dataSource[index].sumPrice = val;
-              this.setState({value: dataSource});
+              this.setState({ value: dataSource });
               this.triggerChange(dataSource);
             }}
             style={{ width: '100px' }}
@@ -167,9 +178,7 @@ export default class GoodsTypeSelector extends Component {
         title: '操作',
         width: 120,
         align: 'center',
-        render: (val, record, index) => (
-          <a onClick={() => this.handleRemove(index)}>删除</a>
-        ),
+        render: (val, record, index) => <a onClick={() => this.handleRemove(index)}>删除</a>,
       },
     ];
 
@@ -181,12 +190,7 @@ export default class GoodsTypeSelector extends Component {
 
     return (
       <Fragment>
-        <Table
-          rowKey={row => row.skuId}
-          dataSource={value}
-          pagination={false}
-          columns={columns}
-        />
+        <Table rowKey={row => row.skuId} dataSource={value} pagination={false} columns={columns} />
         <a onClick={this.handleAddRow}>添加商品</a>
         <GoodsSkuSelector {...parentMethods} modalVisible={modalVisible} />
       </Fragment>

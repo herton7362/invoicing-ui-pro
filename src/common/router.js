@@ -97,21 +97,19 @@ export const getRouterData = app => {
       name: '采购订单',
     },
     '/purchase/add': {
-      component: dynamicWrapper(app, [
-        'purchaseOrder',
-        'warehouse',
-        'businessRelatedUnit',
-        'goods',
-      ], () => import('../routes/Purchase/Form')),
+      component: dynamicWrapper(
+        app,
+        ['purchaseOrder', 'warehouse', 'businessRelatedUnit', 'goods'],
+        () => import('../routes/Purchase/Form')
+      ),
       name: '采购订单维护',
     },
     '/purchase/edit/:id': {
-      component: dynamicWrapper(app, [
-        'purchaseOrder',
-        'warehouse',
-        'businessRelatedUnit',
-        'goods',
-      ], () => import('../routes/Purchase/Form')),
+      component: dynamicWrapper(
+        app,
+        ['purchaseOrder', 'warehouse', 'businessRelatedUnit', 'goods'],
+        () => import('../routes/Purchase/Form')
+      ),
       name: '采购订单维护',
     },
     '/purchase/supplier': {

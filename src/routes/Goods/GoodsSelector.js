@@ -33,10 +33,8 @@ export default class GoodsTypeSelector extends Component {
 
   triggerChange = changedValue => {
     const { onChange } = this.props;
-    if (!('value' in this.props))
-      this.setState({ value: changedValue });
-    if (onChange)
-      onChange(changedValue);
+    if (!('value' in this.props)) this.setState({ value: changedValue });
+    if (onChange) onChange(changedValue);
   };
 
   handleSearch = name => {
@@ -54,12 +52,7 @@ export default class GoodsTypeSelector extends Component {
   };
 
   render() {
-    const {
-      dispatch,
-      goods: { list },
-      loading,
-      ...rest
-    } = this.props;
+    const { dispatch, goods: { list }, loading, ...rest } = this.props;
     const { value } = this.state;
 
     return (
@@ -74,7 +67,9 @@ export default class GoodsTypeSelector extends Component {
         {...rest}
       >
         {list.map(data => (
-          <Option key={data.id} value={data.id}>{data.name}</Option>
+          <Option key={data.id} value={data.id}>
+            {data.name}
+          </Option>
         ))}
       </Select>
     );

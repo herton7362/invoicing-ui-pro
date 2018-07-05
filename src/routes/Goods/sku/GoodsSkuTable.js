@@ -56,29 +56,38 @@ export default class GoodsSkuTable extends Component {
     });
 
     const attrCombo = this.getGoodsAttrCombo(attrGroup);
-    const addGoodsAttributes = attr => attr.goodsAttributes
-      ? attr
-      : Object.assign(attr, {
-        goodsAttributes: Object.keys(attr)
-          .filter(key =>
-            goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key)
-          )
-          .sort().map(key => `${key}:${attr[key]}`).join(','),
-      })
+    const addGoodsAttributes = attr =>
+      attr.goodsAttributes
+        ? attr
+        : Object.assign(attr, {
+            goodsAttributes: Object.keys(attr)
+              .filter(key =>
+                goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key)
+              )
+              .sort()
+              .map(key => `${key}:${attr[key]}`)
+              .join(','),
+          });
 
-    const addGoodsAttributeIds = attr => attr.goodsAttributeIds
-      ? attr
-      : Object.assign(attr, {
-        goodsAttributeIds: Object.keys(attr)
-          .filter(key =>
-            goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key)
-          )
-          .sort()
-          .map(key =>
-            goodsAttributes.find(goodsAttribute =>
-              goodsAttribute.goodsTypeAttributeId === key
-              && goodsAttribute.goodsTypeAttributeValue === attr[key]).id).join(','),
-      });
+    const addGoodsAttributeIds = attr =>
+      attr.goodsAttributeIds
+        ? attr
+        : Object.assign(attr, {
+            goodsAttributeIds: Object.keys(attr)
+              .filter(key =>
+                goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key)
+              )
+              .sort()
+              .map(
+                key =>
+                  goodsAttributes.find(
+                    goodsAttribute =>
+                      goodsAttribute.goodsTypeAttributeId === key &&
+                      goodsAttribute.goodsTypeAttributeValue === attr[key]
+                  ).id
+              )
+              .join(','),
+          });
 
     const addGoodsExtraParams = attr => addGoodsAttributeIds(addGoodsAttributes(attr));
 
@@ -202,7 +211,8 @@ export default class GoodsSkuTable extends Component {
       goodsAttributes,
       goodsTypeAttributes,
       columns,
-      ...restProps } = this.props;
+      ...restProps
+    } = this.props;
     const { dataSource } = this.state;
 
     const tableColumns = columns(dataSource);
@@ -217,8 +227,7 @@ export default class GoodsSkuTable extends Component {
 
     return (
       <Fragment>
-        {goodsTypeAttributes.length > 0 &&
-        (
+        {goodsTypeAttributes.length > 0 && (
           <Table
             rowKey={record => `${goodsTypeAttributes.map(attr => record[attr.id])}`}
             dataSource={dataSource}
