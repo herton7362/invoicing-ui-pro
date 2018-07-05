@@ -2,7 +2,8 @@ import React, { PureComponent } from 'react';
 
 import { connect } from 'dva/index';
 import { routerRedux } from 'dva/router';
-import { Card, Form, Button, DatePicker, Input, Popover, Icon } from 'antd';
+import { Card, Form, Button, DatePicker, Input, Popover, Icon, message } from 'antd';
+import moment from 'moment';
 import FooterToolbar from 'components/FooterToolbar';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import SupplierSelector from '../Supplier/SupplierSelector';
@@ -36,7 +37,7 @@ const fieldLabels = {
         value: formData.operator,
       }),
       deliveryDate: Form.createFormField({
-        value: formData.deliveryDate,
+        value: moment(formData.deliveryDate),
       }),
       warehouseId: Form.createFormField({
         value: formData.warehouseId,
@@ -85,22 +86,38 @@ export default class GoodsForm extends PureComponent {
     window.removeEventListener('resize', this.resizeFooterToolbar);
   }
 
-  handleSubmit = e => {
+  handleSubmit = (e, fieldsValue, status) => {
     e.preventDefault();
     const { form, dispatch, purchaseOrder: { formData } } = this.props;
 
+    form.resetFields();
+    dispatch({
+      type: 'purchaseOrder/save',
+      payload: {
+        ...formData,
+        ...fieldsValue,
+        status,
+      },
+    }).then(() => {
+      message.success('保存成功');
+      this.handleGoBack();
+    });
+  };
+
+  handleSave = e => {
+    e.preventDefault();
+    const { form } = this.props;
+    const fieldsValue = form.getFieldsValue();
+    this.handleSubmit(e, fieldsValue, 'DRAFT');
+  };
+
+  handleConfirm = e => {
+    e.preventDefault();
+    const { form } = this.props;
+
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      form.resetFields();
-      dispatch({
-        type: 'purchaseOrder/save',
-        payload: {
-          ...formData,
-          ...fieldsValue,
-        },
-      }).then(() => {
-        this.handleGoBack();
-      });
+      this.handleSubmit(e, fieldsValue, 'CONFIRMED');
     });
   };
 
@@ -180,11 +197,7 @@ export default class GoodsForm extends PureComponent {
         <div>
           <Form>
             <Card style={{ marginTop: 8 }} bordered={false} title="订单信息">
-              <FormItem
-                {...formItemLayout}
-                label="供应商"
-                extra="可根据选择的商品自动填充"
-              >
+              <FormItem {...formItemLayout} label="供应商" extra="可根据选择的商品自动填充">
                 {getFieldDecorator('businessRelatedUnitId', {
                   rules: [
                     {
@@ -194,10 +207,7 @@ export default class GoodsForm extends PureComponent {
                   ],
                 })(<SupplierSelector style={{ width: 300 }} />)}
               </FormItem>
-              <FormItem
-                {...formItemLayout}
-                label="交货日期"
-              >
+              <FormItem {...formItemLayout} label="交货日期">
                 {getFieldDecorator('deliveryDate', {
                   rules: [
                     {
@@ -207,10 +217,7 @@ export default class GoodsForm extends PureComponent {
                   ],
                 })(<DatePicker />)}
               </FormItem>
-              <FormItem
-                {...formItemLayout}
-                label="交货到"
-              >
+              <FormItem {...formItemLayout} label="交货到">
                 {getFieldDecorator('warehouseId', {
                   rules: [
                     {
@@ -222,23 +229,26 @@ export default class GoodsForm extends PureComponent {
               </FormItem>
               <FormItem {...formItemLayout} label="附加说明">
                 {getFieldDecorator('remark')(
-                  <TextArea style={{ minHeight: 32 }} placeholder="你可以填写一个附加说明" rows={4} />
+                  <TextArea
+                    style={{ minHeight: 32 }}
+                    placeholder="你可以填写一个附加说明"
+                    rows={4}
+                  />
                 )}
               </FormItem>
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="商品信息">
-              <FormItem>
-                {getFieldDecorator('items')(
-                  <Skus />
-                )}
-              </FormItem>
+              <FormItem>{getFieldDecorator('items')(<Skus />)}</FormItem>
             </Card>
 
             <FooterToolbar style={{ width: this.state.width }}>
               {getErrorInfo()}
-              <Button type="primary" onClick={this.handleSubmit} loading={submitting}>
-                提交
+              <Button type="primary" onClick={this.handleConfirm} loading={submitting}>
+                确认订单
+              </Button>
+              <Button type="primary" onClick={this.handleSave} loading={submitting}>
+                保存
               </Button>
               <Button icon="left" style={{ marginLeft: 8 }} onClick={this.handleGoBack}>
                 返回

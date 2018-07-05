@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva/index';
 import { routerRedux } from 'dva/router';
-import { Card, Form, Button, Input, InputNumber, Popover, Icon } from 'antd';
+import { Card, Form, Button, Input, InputNumber, Popover, Icon, message } from 'antd';
 import Pinyin from 'components/Pinyin';
 import FooterToolbar from 'components/FooterToolbar';
 import numeral from 'numeral';
@@ -144,6 +144,7 @@ export default class GoodsForm extends PureComponent {
           ...fieldsValue,
         },
       }).then(() => {
+        message.success('保存成功');
         this.handleGoBack();
       });
     });
@@ -183,7 +184,11 @@ export default class GoodsForm extends PureComponent {
   };
 
   render() {
-    const { submitting, goods: { formData }, goodsTypeAttribute: { data: { list: goodsTypeAttributes = [] } } } = this.props;
+    const {
+      submitting,
+      goods: { formData },
+      goodsTypeAttribute: { data: { list: goodsTypeAttributes = [] } },
+    } = this.props;
     const { getFieldDecorator, setFieldsValue, getFieldsError } = this.props.form;
 
     const errors = getFieldsError();
@@ -319,7 +324,10 @@ export default class GoodsForm extends PureComponent {
                 })(<GoodsTypeSelector style={{ width: 300 }} />)}
               </FormItem>
               {getFieldDecorator('goodsAttributes')(
-                <AttributeCheckboxGroup {...formItemLayout} goodsTypeAttributes={goodsTypeAttributes} />
+                <AttributeCheckboxGroup
+                  {...formItemLayout}
+                  goodsTypeAttributes={goodsTypeAttributes}
+                />
               )}
               <FormItem
                 labelCol={{
@@ -334,7 +342,10 @@ export default class GoodsForm extends PureComponent {
                 label="商品sku"
               >
                 {getFieldDecorator('goodsSkus')(
-                  <GoodsSkus goodsAttributes={formData.goodsAttributes} goodsTypeAttributes={goodsTypeAttributes} />
+                  <GoodsSkus
+                    goodsAttributes={formData.goodsAttributes}
+                    goodsTypeAttributes={goodsTypeAttributes}
+                  />
                 )}
               </FormItem>
             </Card>

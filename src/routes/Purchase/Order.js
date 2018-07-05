@@ -98,6 +98,14 @@ export default class OrderList extends PureComponent {
       {
         title: '状态',
         dataIndex: 'status',
+        render: val => {
+          const status = {
+            CANCEL: '已取消',
+            DRAFT: '草稿',
+            CONFIRMED: '已确认',
+          };
+          return status[val];
+        },
       },
       {
         title: '操作',
