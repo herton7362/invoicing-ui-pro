@@ -1,41 +1,37 @@
 import React, { Component } from 'react';
 
-import { InputNumber, Modal, Form, Button } from 'antd';
+import { InputNumber, Modal, Button } from 'antd';
 import { connect } from 'dva';
 
-import AttributeCheckboxGroup from '../AttributeCheckboxGroup';
-import GoodsSelector from '../GoodsSelector';
 import GoodsSkuTable from './GoodsSkuTable';
-
-const FormItem = Form.Item;
 
 @connect(({ goods, goodsTypeAttribute }) => ({
   goods,
   goodsTypeAttribute,
 }))
-@Form.create()
 export default class GoodsSkus extends Component {
   state = {
     goodsId: undefined,
+    goodsName: undefined,
     goodsAttributes: [],
     goodsSkus: [],
   };
 
-  onSelectGoods = goodsId => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'goods/fetchOne',
-      payload: { id: goodsId },
-      callback: response => {
+  componentWillReceiveProps(nextProps) {
+    if ('goods' in nextProps) {
+      const { goodsId } = this.state;
+      const { goods: { formData } } = nextProps;
+      if(formData.id !== goodsId) {
         this.setState({
-          goodsId,
-          goodsAttributes: response.goodsAttributes,
-          goodsSkus: response.goodsSkus,
+          goodsId: formData.id,
+          goodsName: formData.name,
+          goodsAttributes: formData.goodsAttributes,
+          goodsSkus: formData.goodsSkus,
         });
-        this.handleLoadAttributes(response.goodsTypeId);
-      },
-    });
-  };
+        this.handleLoadAttributes(formData.goodsTypeId);
+      }
+    }
+  }
 
   bootGoodsSkusData = goodsSkus => {
     return goodsSkus.map(goodsSku =>
@@ -81,6 +77,9 @@ export default class GoodsSkus extends Component {
     const resultFormat = result =>
       result.map(sku =>
         Object.assign(sku, {
+          id: null,
+          goodsId,
+          skuId: sku.id,
           goods: Object.assign({}, list.find(row => row.id === goodsId)),
           attributeName: attributeNameFormat(sku),
         })
@@ -110,18 +109,7 @@ export default class GoodsSkus extends Component {
       onCancel,
     } = this.props;
 
-    const { goodsId, goodsAttributes, goodsSkus } = this.state;
-
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 3 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 21 },
-      },
-    };
+    const { goodsName, goodsAttributes, goodsSkus } = this.state;
 
     const columns = currentDataSource => [
       {
@@ -192,7 +180,7 @@ export default class GoodsSkus extends Component {
 
     return (
       <Modal
-        title="商品选择"
+        title={goodsName}
         visible={modalVisible}
         width={960}
         onCancel={() => this.clearSelected(handleModalVisible)}
@@ -205,20 +193,12 @@ export default class GoodsSkus extends Component {
           </Button>,
         ]}
       >
-        <FormItem {...formItemLayout} label="商品">
-          <GoodsSelector value={goodsId} onChange={this.onSelectGoods} style={{ width: '250px' }} />
-        </FormItem>
-        <AttributeCheckboxGroup
-          {...formItemLayout}
-          value={goodsAttributes}
-          goodsTypeAttributes={goodsTypeAttributes}
-          onChange={changedValue => this.setState({ goodsAttributes: changedValue })}
-        />
         <GoodsSkuTable
           value={goodsSkus}
           goodsAttributes={goodsAttributes}
           goodsTypeAttributes={goodsTypeAttributes}
           valueChangeFilter={this.bootGoodsSkusData}
+          onChange={this.triggerChange}
           columns={columns}
           style={{ padding: '0 30px' }}
           size="small"

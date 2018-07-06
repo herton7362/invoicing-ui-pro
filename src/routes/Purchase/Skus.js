@@ -1,8 +1,16 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
+
+import {connect} from "dva/index";
 
 import { Table, InputNumber } from 'antd';
+import GoodsSelector from '../Goods/GoodsSelector';
 import GoodsSkuSelector from '../Goods/sku/GoodsSkuSelector';
 
+import styles from './Skus.less';
+
+@connect(({ goods }) => ({
+  goods,
+}))
 export default class GoodsTypeSelector extends Component {
   state = {
     value: [],
@@ -12,19 +20,19 @@ export default class GoodsTypeSelector extends Component {
   componentWillReceiveProps(nextProps) {
     if ('value' in nextProps) {
       const { value } = nextProps;
-      this.setState({ value });
+      this.setState({ value: this.mergeCell(value) });
     }
   }
 
   onGoodsSkuSelected = goodsSkus => {
     const { value = [] } = this.state;
 
-    const matchedRows = value.filter(row1 => goodsSkus.some(row2 => row2.id === row1.id));
-    const restRows = goodsSkus.filter(row1 => matchedRows.every(row2 => row2.id !== row1.id));
+    const matchedRows = value.filter(row1 => goodsSkus.some(row2 => row2.skuId === row1.skuId));
+    const restRows = goodsSkus.filter(row1 => matchedRows.every(row2 => row2.skuId !== row1.skuId));
     const increaseCount = rows => {
       rows.forEach(row =>
         Object.assign(row, {
-          count: row.count + goodsSkus.find(sku => sku.id === row.id).count,
+          count: row.count + goodsSkus.find(sku => sku.skuId === row.skuId).count,
         })
       );
     };
@@ -37,49 +45,48 @@ export default class GoodsTypeSelector extends Component {
         )
       );
     };
-    const groupByGoods = result =>
-      result.sort((row1, row2) => (row1.goodsId === row2.goodsId ? 0 : -1));
     const filter = result => [...result.filter(row => row.count > 0)];
 
     increaseCount(matchedRows);
     appendNewSkus(restRows);
 
-    this.triggerChange(this.mergeCell(groupByGoods(filter(value))));
+    this.triggerChange(filter(value));
   };
 
-  mergeCell = result => {
-    let lastGoodsId;
-    return result.map(row => {
-      const newRow = Object.assign(row, {
-        goods: Object.assign(row.goods, {
-          rowSpan:
-            lastGoodsId !== row.goodsId
-              ? result.filter(tmp => tmp.goodsId === row.goodsId).length
-              : 0,
-        }),
-      });
-      lastGoodsId = row.goodsId;
-      return newRow;
+  onSelectGoods = goodsId => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'goods/fetchOne',
+      payload: { id: goodsId },
     });
-  };
-
-  dataToObject = data => {
-    return data.map(row =>
-      Object.assign(row, {
-        id: null,
-        skuId: row.id,
-      })
-    );
+    this.setState({ modalVisible: true });
   };
 
   triggerChange = changedValue => {
     const { onChange } = this.props;
     if (!('value' in this.props)) this.setState({ value: changedValue });
-    if (onChange) onChange(this.dataToObject(changedValue));
+    if (onChange) onChange(changedValue);
   };
 
-  handleAddRow = () => {
-    this.setState({ modalVisible: true });
+  mergeCell = result => {
+    let lastGoodsId;
+    if(!result) {
+      return result;
+    }
+    return result
+      .sort((row1, row2) => (row1.goodsId === row2.goodsId ? 0 : -1))
+      .map(row => {
+        const newRow = Object.assign(row, {
+          goods: Object.assign(row.goods, {
+            rowSpan:
+              lastGoodsId !== row.goodsId
+                ? result.filter(tmp => tmp.goodsId === row.goodsId).length
+                : 0,
+          }),
+        });
+        lastGoodsId = row.goodsId;
+        return newRow;
+      });
   };
 
   handleRemove = index => {
@@ -189,11 +196,11 @@ export default class GoodsTypeSelector extends Component {
     };
 
     return (
-      <Fragment>
+      <div className={styles.goodsSkus}>
         <Table rowKey={row => row.skuId} dataSource={value} pagination={false} columns={columns} />
-        <a onClick={this.handleAddRow}>添加商品</a>
+        <GoodsSelector className={styles.goodsSelector} onChange={this.onSelectGoods} />
         <GoodsSkuSelector {...parentMethods} modalVisible={modalVisible} />
-      </Fragment>
+      </div>
     );
   }
 }

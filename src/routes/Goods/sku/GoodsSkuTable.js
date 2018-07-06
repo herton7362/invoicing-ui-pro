@@ -69,28 +69,7 @@ export default class GoodsSkuTable extends Component {
               .join(','),
           });
 
-    const addGoodsAttributeIds = attr =>
-      attr.goodsAttributeIds
-        ? attr
-        : Object.assign(attr, {
-            goodsAttributeIds: Object.keys(attr)
-              .filter(key =>
-                goodsAttributes.some(goodsAttribute => goodsAttribute.goodsTypeAttributeId === key)
-              )
-              .sort()
-              .map(
-                key =>
-                  goodsAttributes.find(
-                    goodsAttribute =>
-                      goodsAttribute.goodsTypeAttributeId === key &&
-                      goodsAttribute.goodsTypeAttributeValue === attr[key]
-                  ).id
-              )
-              .join(','),
-          });
-
-    const addGoodsExtraParams = attr => addGoodsAttributeIds(addGoodsAttributes(attr));
-
+    const addGoodsExtraParams = attr => addGoodsAttributes(attr);
     const result = attrCombo
       .map(group =>
         group

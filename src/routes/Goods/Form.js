@@ -137,6 +137,7 @@ export default class GoodsForm extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       form.resetFields();
+
       dispatch({
         type: 'goods/save',
         payload: {

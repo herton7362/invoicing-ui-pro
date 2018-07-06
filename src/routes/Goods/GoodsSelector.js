@@ -17,7 +17,7 @@ export default class GoodsTypeSelector extends Component {
   }
 
   state = {
-    value: null,
+    value: undefined,
   };
 
   componentDidMount() {
