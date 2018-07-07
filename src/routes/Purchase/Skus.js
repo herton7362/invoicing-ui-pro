@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import {connect} from "dva/index";
 
+import PropTypes from "prop-types";
 import { Table, InputNumber } from 'antd';
 import GoodsSelector from '../Goods/GoodsSelector';
 import GoodsSkuSelector from '../Goods/sku/GoodsSkuSelector';
@@ -12,6 +13,14 @@ import styles from './Skus.less';
   goods,
 }))
 export default class GoodsTypeSelector extends Component {
+  static defaultProps = {
+    businessRelatedUnitId: null,
+  };
+
+  static propTypes = {
+    businessRelatedUnitId: PropTypes.string,
+  };
+
   state = {
     value: [],
     modalVisible: false,
@@ -40,7 +49,7 @@ export default class GoodsTypeSelector extends Component {
       value.push(
         ...rows.map((goodsSku, index) =>
           Object.assign(goodsSku, {
-            goods: Object.assign(goodsSku.goods, { rowSpan: index === 0 ? rows.length : 0 }),
+            goods: Object.assign({}, goodsSku.goods, {rowSpan: index === 0 ? rows.length : 0}),
           })
         )
       );
@@ -49,7 +58,6 @@ export default class GoodsTypeSelector extends Component {
 
     increaseCount(matchedRows);
     appendNewSkus(restRows);
-
     this.triggerChange(filter(value));
   };
 
@@ -104,6 +112,7 @@ export default class GoodsTypeSelector extends Component {
   };
 
   render() {
+    const { businessRelatedUnitId } = this.props;
     const { value, modalVisible } = this.state;
     const columns = [
       {
@@ -198,8 +207,8 @@ export default class GoodsTypeSelector extends Component {
     return (
       <div className={styles.goodsSkus}>
         <Table rowKey={row => row.skuId} dataSource={value} pagination={false} columns={columns} />
-        <GoodsSelector className={styles.goodsSelector} onChange={this.onSelectGoods} />
-        <GoodsSkuSelector {...parentMethods} modalVisible={modalVisible} />
+        <GoodsSelector onChange={this.onSelectGoods} />
+        <GoodsSkuSelector {...parentMethods} modalVisible={modalVisible} businessRelatedUnitId={businessRelatedUnitId} />
       </div>
     );
   }

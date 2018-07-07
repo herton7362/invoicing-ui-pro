@@ -114,7 +114,7 @@ export default class OrderList extends PureComponent {
             <a onClick={() => this.handleOpenEditPage(record.id)}>编辑</a>
             <Divider type="vertical" />
             <Popconfirm
-              title={`确定删除${record.name}吗?`}
+              title={`确定删除${record.orderNumber}吗?`}
               onConfirm={() => this.handleRemove(record.id)}
             >
               <a>删除</a>

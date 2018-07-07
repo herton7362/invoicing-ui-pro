@@ -134,7 +134,7 @@ export default class GoodsForm extends PureComponent {
   };
 
   render() {
-    const { submitting } = this.props;
+    const { submitting, purchaseOrder: { formData } } = this.props;
     const { getFieldDecorator, getFieldsError } = this.props.form;
 
     const errors = getFieldsError();
@@ -239,7 +239,11 @@ export default class GoodsForm extends PureComponent {
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="商品信息">
-              <FormItem>{getFieldDecorator('items')(<Skus />)}</FormItem>
+              <FormItem>
+                {getFieldDecorator('items')(
+                  <Skus businessRelatedUnitId={formData.businessRelatedUnitId} />
+                )}
+              </FormItem>
             </Card>
 
             <FooterToolbar style={{ width: this.state.width }}>

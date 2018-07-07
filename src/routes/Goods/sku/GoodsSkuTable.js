@@ -24,8 +24,9 @@ export default class GoodsSkuTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { value, goodsAttributes, valueChangeFilter } = nextProps;
-    const dataSource = this.getSkusByGoodsAttributes(goodsAttributes, value);
-    this.setState({ dataSource: valueChangeFilter(dataSource) });
+    const dataSource = valueChangeFilter(this.getSkusByGoodsAttributes(goodsAttributes, value));
+    this.setState({ dataSource });
+    this.triggerChange(dataSource);
   }
 
   getGoodsAttrCombo = attrs => {
@@ -185,9 +186,6 @@ export default class GoodsSkuTable extends Component {
 
   render() {
     const {
-      children,
-      value,
-      goodsAttributes,
       goodsTypeAttributes,
       columns,
       ...restProps
@@ -208,7 +206,7 @@ export default class GoodsSkuTable extends Component {
       <Fragment>
         {goodsTypeAttributes.length > 0 && (
           <Table
-            rowKey={record => `${goodsTypeAttributes.map(attr => record[attr.id])}`}
+            rowKey={record => record.skuId}
             dataSource={dataSource}
             columns={tableColumns}
             onChange={this.triggerChange}

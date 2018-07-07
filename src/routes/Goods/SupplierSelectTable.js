@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
-import { Table, InputNumber, Popconfirm } from 'antd';
+import { Table, InputNumber, Popconfirm, message } from 'antd';
 import SupplierSelector from '../Supplier/SupplierSelector';
 
 export default class GoodsTypeSelector extends Component {
@@ -36,8 +36,15 @@ export default class GoodsTypeSelector extends Component {
     }));
   };
 
-  handerSaveRow = (rowIndex, record) => {
+  handleSaveRow = (rowIndex, record) => {
     const { value = [] } = this.state;
+    const exist = businessRelatedUnitId => value.some(val => val.businessRelatedUnitId === businessRelatedUnitId);
+
+    if(exist(record.businessRelatedUnitId)) {
+      message.warn("供应商不能重复");
+      return;
+    }
+
     const list = value.map((val, i) => (i === rowIndex ? Object.assign(val, record) : val));
 
     if (list[rowIndex].businessRelatedUnitId) {
@@ -63,7 +70,7 @@ export default class GoodsTypeSelector extends Component {
           <SupplierSelector
             size="small"
             value={val}
-            onChange={v => this.handerSaveRow(index, { businessRelatedUnitId: v })}
+            onChange={v => this.handleSaveRow(index, { businessRelatedUnitId: v })}
           />
         ),
       },
@@ -77,7 +84,7 @@ export default class GoodsTypeSelector extends Component {
             size="small"
             value={val}
             style={{ width: '100%' }}
-            onChange={v => this.handerSaveRow(index, { minimumCount: v })}
+            onChange={v => this.handleSaveRow(index, { minimumCount: v })}
           />
         ),
       },
@@ -91,7 +98,7 @@ export default class GoodsTypeSelector extends Component {
             size="small"
             value={val}
             style={{ width: '100%' }}
-            onChange={v => this.handerSaveRow(index, { price: v })}
+            onChange={v => this.handleSaveRow(index, { price: v })}
           />
         ),
       },

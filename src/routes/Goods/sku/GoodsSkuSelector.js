@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import PropTypes from "prop-types";
 import { InputNumber, Modal, Button } from 'antd';
 import { connect } from 'dva';
 
@@ -10,21 +11,32 @@ import GoodsSkuTable from './GoodsSkuTable';
   goodsTypeAttribute,
 }))
 export default class GoodsSkus extends Component {
+  static defaultProps = {
+    businessRelatedUnitId: null,
+  };
+
+  static propTypes = {
+    businessRelatedUnitId: PropTypes.string,
+  };
+
+  constructor() {
+    super();
+    this.value = [];
+  }
+
   state = {
-    goodsId: undefined,
-    goodsName: undefined,
+    goods: undefined,
     goodsAttributes: [],
     goodsSkus: [],
   };
 
   componentWillReceiveProps(nextProps) {
     if ('goods' in nextProps) {
-      const { goodsId } = this.state;
+      const { goods = {} } = this.state;
       const { goods: { formData } } = nextProps;
-      if(formData.id !== goodsId) {
+      if(formData.id !== goods.id) {
         this.setState({
-          goodsId: formData.id,
-          goodsName: formData.name,
+          goods: formData,
           goodsAttributes: formData.goodsAttributes,
           goodsSkus: formData.goodsSkus,
         });
@@ -34,13 +46,32 @@ export default class GoodsSkus extends Component {
   }
 
   bootGoodsSkusData = goodsSkus => {
-    return goodsSkus.map(goodsSku =>
-      Object.assign(goodsSku, {
-        price: goodsSku.price || goodsSku.lastPurchasePrice,
-        count: goodsSku.count || 0,
-        sumPrice: goodsSku.sumPrice || 0,
+    const {
+      businessRelatedUnitId,
+      goodsTypeAttribute: { data: { list: goodsTypeAttributes = [] } },
+    } = this.props;
+    const { goods } = this.state;
+    const attributeNameFormat = sku =>
+      goodsTypeAttributes.map(attr => `${attr.name}：${sku[attr.id]}`).join('，');
+
+    const goodsSupplier = goods && goods.goodsSuppliers
+      .find(supplier => supplier.businessRelatedUnitId === businessRelatedUnitId);
+
+    return goodsSkus.map(goodsSku => {
+      const price = goodsSku.price || (goodsSupplier && goodsSupplier.price) || goodsSku.lastPurchasePrice;
+      const count = goodsSku.count || (goodsSupplier && goodsSupplier.minimumCount) || 0;
+
+      return Object.assign(goodsSku, {
+        id: null,
+        goodsId: goods.id,
+        goods,
+        skuId: goodsSku.skuId || goodsSku.id,
+        attributeName: attributeNameFormat(goodsSku),
+        price,
+        count,
+        sumPrice: goodsSku.sumPrice || price * count || 0,
       })
-    );
+    });
   };
 
   handleLoadAttributes = goodsTypeId => {
@@ -63,36 +94,24 @@ export default class GoodsSkus extends Component {
     }
   };
 
+  triggerChange = changedValue=> {
+    this.value = changedValue;
+  };
+
   handleOk = () => {
     const {
       onOk,
       handleModalVisible,
-      goodsTypeAttribute: { data: { list: goodsTypeAttributes = [] } },
-      goods: { list },
     } = this.props;
 
-    const { goodsId, goodsSkus } = this.state;
-    const attributeNameFormat = sku =>
-      goodsTypeAttributes.map(attr => `${attr.name}：${sku[attr.id]}`).join('，');
-    const resultFormat = result =>
-      result.map(sku =>
-        Object.assign(sku, {
-          id: null,
-          goodsId,
-          skuId: sku.id,
-          goods: Object.assign({}, list.find(row => row.id === goodsId)),
-          attributeName: attributeNameFormat(sku),
-        })
-      );
-
-    onOk(resultFormat(goodsSkus));
+    onOk(this.value);
     this.clearSelected();
     handleModalVisible();
   };
 
   clearSelected = callback => {
     this.setState({
-      goodsId: undefined,
+      goods: undefined,
       goodsAttributes: [],
       goodsSkus: [],
     });
@@ -109,7 +128,7 @@ export default class GoodsSkus extends Component {
       onCancel,
     } = this.props;
 
-    const { goodsName, goodsAttributes, goodsSkus } = this.state;
+    const { goods = {}, goodsAttributes, goodsSkus } = this.state;
 
     const columns = currentDataSource => [
       {
@@ -180,7 +199,7 @@ export default class GoodsSkus extends Component {
 
     return (
       <Modal
-        title={goodsName}
+        title={goods.name}
         visible={modalVisible}
         width={960}
         onCancel={() => this.clearSelected(handleModalVisible)}
