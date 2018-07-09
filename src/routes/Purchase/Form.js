@@ -251,9 +251,13 @@ export default class GoodsForm extends PureComponent {
               <Button type="primary" onClick={this.handleConfirm} loading={submitting}>
                 确认订单
               </Button>
-              <Button type="primary" onClick={this.handleSave} loading={submitting}>
-                保存
-              </Button>
+              {
+                formData.status !== 'CONFIRMED' && (
+                  <Button type="primary" onClick={this.handleSave} loading={submitting}>
+                    保存
+                  </Button>
+                )
+              }
               <Button icon="left" style={{ marginLeft: 8 }} onClick={this.handleGoBack}>
                 返回
               </Button>
