@@ -24,9 +24,8 @@ export default class GoodsSkuTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { value, goodsAttributes, valueChangeFilter } = nextProps;
-    const dataSource = valueChangeFilter(this.getSkusByGoodsAttributes(goodsAttributes, value));
+    const dataSource = this.getSkusByGoodsAttributes(goodsAttributes, valueChangeFilter(value));
     this.setState({ dataSource });
-    this.triggerChange(dataSource);
   }
 
   getGoodsAttrCombo = attrs => {
