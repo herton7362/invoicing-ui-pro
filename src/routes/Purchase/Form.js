@@ -17,7 +17,7 @@ const { TextArea } = Input;
 
 const fieldLabels = {
   businessRelatedUnitId: '供应商',
-  deliveryDate: '交货日期',
+  bookTransferDate: '交货日期',
   warehouseId: '仓库',
 };
 
@@ -36,8 +36,8 @@ const fieldLabels = {
       operator: Form.createFormField({
         value: formData.operator,
       }),
-      deliveryDate: Form.createFormField({
-        value: moment(formData.deliveryDate),
+      bookTransferDate: Form.createFormField({
+        value: formData.bookTransferDate ? moment(formData.bookTransferDate) : null,
       }),
       warehouseId: Form.createFormField({
         value: formData.warehouseId,
@@ -117,6 +117,7 @@ export default class GoodsForm extends PureComponent {
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
+      console.log(fieldsValue);
       this.handleSubmit(e, fieldsValue, 'CONFIRMED');
     });
   };
@@ -197,7 +198,7 @@ export default class GoodsForm extends PureComponent {
         <div>
           <Form>
             <Card style={{ marginTop: 8 }} bordered={false} title="订单信息">
-              <FormItem {...formItemLayout} label="供应商" extra="可根据选择的商品自动填充">
+              <FormItem {...formItemLayout} label="供应商">
                 {getFieldDecorator('businessRelatedUnitId', {
                   rules: [
                     {
@@ -207,8 +208,8 @@ export default class GoodsForm extends PureComponent {
                   ],
                 })(<SupplierSelector style={{ width: 300 }} />)}
               </FormItem>
-              <FormItem {...formItemLayout} label="交货日期">
-                {getFieldDecorator('deliveryDate', {
+              <FormItem {...formItemLayout} label="预订交货日期">
+                {getFieldDecorator('bookTransferDate', {
                   rules: [
                     {
                       required: true,
@@ -248,16 +249,26 @@ export default class GoodsForm extends PureComponent {
 
             <FooterToolbar style={{ width: this.state.width }}>
               {getErrorInfo()}
-              <Button type="primary" onClick={this.handleConfirm} loading={submitting}>
-                确认订单
-              </Button>
-              {
-                formData.status !== 'CONFIRMED' && (
-                  <Button type="primary" onClick={this.handleSave} loading={submitting}>
-                    保存
-                  </Button>
-                )
-              }
+              {formData.status === 'CONFIRMED' && (
+                <Button
+                  type="primary"
+                  icon="car"
+                  onClick={this.handleDelivery}
+                  loading={submitting}
+                >
+                  送货
+                </Button>
+              )}
+              {formData.status !== 'CONFIRMED' && (
+                <Button type="primary" onClick={this.handleConfirm} loading={submitting}>
+                  确认订单
+                </Button>
+              )}
+              {formData.status !== 'CONFIRMED' && (
+                <Button type="primary" onClick={this.handleSave} loading={submitting}>
+                  保存
+                </Button>
+              )}
               <Button icon="left" style={{ marginLeft: 8 }} onClick={this.handleGoBack}>
                 返回
               </Button>

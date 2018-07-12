@@ -1,16 +1,18 @@
 .goodsSkus {
-  :global {
-    .ant-select {
-      width: 250px;
-      margin-top: 16px;
+  :global(.ant-select) {
+    width: 250px;
+    margin-top: 16px;
+  }
+  :global(.ant-select-selection__placeholder) {
+    color: #1890ff;
+  }
+  :global(.ant-select-focused) {
+    :global(.ant-select-selection__placeholder) {
+      color: #bfbfbf;
     }
-    .ant-select-selection__placeholder {
-      color: #1890ff;
-    }
-    .ant-select-focused {
-      .ant-select-selection__placeholder {
-        color: #bfbfbf;
-      }
-    }
+  }
+  .tableFooter {
+    font-weight: 700;
+    text-align: right;
   }
 }

@@ -38,10 +38,11 @@ export default class GoodsTypeSelector extends Component {
 
   handleSaveRow = (rowIndex, record) => {
     const { value = [] } = this.state;
-    const exist = businessRelatedUnitId => value.some(val => val.businessRelatedUnitId === businessRelatedUnitId);
+    const exist = businessRelatedUnitId =>
+      value.some(val => val.businessRelatedUnitId === businessRelatedUnitId);
 
-    if(exist(record.businessRelatedUnitId)) {
-      message.warn("供应商不能重复");
+    if (exist(record.businessRelatedUnitId)) {
+      message.warn('供应商不能重复');
       return;
     }
 

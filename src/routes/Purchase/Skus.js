@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 
-import {connect} from "dva/index";
+import { connect } from 'dva/index';
 
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 import { Table, InputNumber } from 'antd';
 import GoodsSelector from '../Goods/GoodsSelector';
 import GoodsSkuSelector from '../Goods/sku/GoodsSkuSelector';
@@ -49,7 +49,7 @@ export default class GoodsTypeSelector extends Component {
       value.push(
         ...rows.map((goodsSku, index) =>
           Object.assign(goodsSku, {
-            goods: Object.assign({}, goodsSku.goods, {rowSpan: index === 0 ? rows.length : 0}),
+            goods: Object.assign({}, goodsSku.goods, { rowSpan: index === 0 ? rows.length : 0 }),
           })
         )
       );
@@ -78,23 +78,21 @@ export default class GoodsTypeSelector extends Component {
 
   mergeCell = result => {
     let lastGoodsId;
-    if(!result) {
+    if (!result) {
       return result;
     }
-    return result
-      .sort((row1, row2) => (row1.goodsId === row2.goodsId ? 0 : -1))
-      .map(row => {
-        const newRow = Object.assign(row, {
-          goods: Object.assign(row.goods, {
-            rowSpan:
-              lastGoodsId !== row.goodsId
-                ? result.filter(tmp => tmp.goodsId === row.goodsId).length
-                : 0,
-          }),
-        });
-        lastGoodsId = row.goodsId;
-        return newRow;
+    return result.sort((row1, row2) => (row1.goodsId === row2.goodsId ? 0 : -1)).map(row => {
+      const newRow = Object.assign(row, {
+        goods: Object.assign(row.goods, {
+          rowSpan:
+            lastGoodsId !== row.goodsId
+              ? result.filter(tmp => tmp.goodsId === row.goodsId).length
+              : 0,
+        }),
       });
+      lastGoodsId = row.goodsId;
+      return newRow;
+    });
   };
 
   handleRemove = index => {
@@ -206,9 +204,23 @@ export default class GoodsTypeSelector extends Component {
 
     return (
       <div className={styles.goodsSkus}>
-        <Table rowKey={row => row.skuId} dataSource={value} pagination={false} columns={columns} />
+        <Table
+          rowKey={row => row.skuId}
+          dataSource={value}
+          pagination={false}
+          columns={columns}
+          footer={currentPageData => (
+            <div className={styles.tableFooter}>
+              总计：￥ {currentPageData.reduce((a, b) => a + b.sumPrice, 0)}
+            </div>
+          )}
+        />
         <GoodsSelector onChange={this.onSelectGoods} />
-        <GoodsSkuSelector {...parentMethods} modalVisible={modalVisible} businessRelatedUnitId={businessRelatedUnitId} />
+        <GoodsSkuSelector
+          {...parentMethods}
+          modalVisible={modalVisible}
+          businessRelatedUnitId={businessRelatedUnitId}
+        />
       </div>
     );
   }
