@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 import { InputNumber, Modal, Button } from 'antd';
 import { connect } from 'dva';
 
 import GoodsSkuTable from './GoodsSkuTable';
+
+import styles from './GoodsSkuSelector.less';
 
 @connect(({ goods, goodsTypeAttribute }) => ({
   goods,
@@ -34,7 +36,7 @@ export default class GoodsSkus extends Component {
     if ('goods' in nextProps) {
       const { goods = {} } = this.state;
       const { goods: { formData } } = nextProps;
-      if(formData.id !== goods.id) {
+      if (formData.id !== goods.id) {
         this.setState({
           goods: formData,
           goodsAttributes: formData.goodsAttributes,
@@ -54,23 +56,27 @@ export default class GoodsSkus extends Component {
     const attributeNameFormat = sku =>
       goodsTypeAttributes.map(attr => `${attr.name}：${sku[attr.id]}`).join('，');
 
-    const goodsSupplier = goods && goods.goodsSuppliers
-      .find(supplier => supplier.businessRelatedUnitId === businessRelatedUnitId);
+    const goodsSupplier =
+      goods &&
+      goods.goodsSuppliers.find(
+        supplier => supplier.businessRelatedUnitId === businessRelatedUnitId
+      );
 
     return goodsSkus.map(goodsSku => {
-      const price = goodsSku.price || (goodsSupplier && goodsSupplier.price) || goodsSku.lastPurchasePrice;
+      const price =
+        goodsSku.price || (goodsSupplier && goodsSupplier.price) || goodsSku.lastPurchasePrice;
       const count = goodsSku.count || (goodsSupplier && goodsSupplier.minimumCount) || 0;
 
       return Object.assign(goodsSku, {
         id: null,
         goodsId: goods.id,
-        goods,
+        goods: Object.assign(goods, { goodsSkus: null }),
         skuId: goodsSku.skuId || goodsSku.id,
         attributeName: attributeNameFormat(goodsSku),
         price,
         count,
         sumPrice: goodsSku.sumPrice || price * count || 0,
-      })
+      });
     });
   };
 
@@ -94,15 +100,12 @@ export default class GoodsSkus extends Component {
     }
   };
 
-  triggerChange = changedValue=> {
+  triggerChange = changedValue => {
     this.value = changedValue;
   };
 
   handleOk = () => {
-    const {
-      onOk,
-      handleModalVisible,
-    } = this.props;
+    const { onOk, handleModalVisible } = this.props;
 
     onOk(this.value);
     this.clearSelected();
@@ -154,6 +157,7 @@ export default class GoodsSkus extends Component {
               dataSource[index].price = val;
               dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
               this.setState({ goodsSkus: dataSource });
+              this.triggerChange(dataSource);
             }}
             style={{ width: '100px' }}
           />
@@ -173,6 +177,7 @@ export default class GoodsSkus extends Component {
               dataSource[index].count = val;
               dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
               this.setState({ goodsSkus: dataSource });
+              this.triggerChange(dataSource);
             }}
             style={{ width: '100px' }}
           />
@@ -190,6 +195,7 @@ export default class GoodsSkus extends Component {
               const dataSource = currentDataSource;
               dataSource[index].sumPrice = val;
               this.setState({ goodsSkus: dataSource });
+              this.triggerChange(dataSource);
             }}
             style={{ width: '100px' }}
           />
@@ -213,6 +219,7 @@ export default class GoodsSkus extends Component {
         ]}
       >
         <GoodsSkuTable
+          className={styles.goodsSkuTable}
           value={goodsSkus}
           goodsAttributes={goodsAttributes}
           goodsTypeAttributes={goodsTypeAttributes}
@@ -222,6 +229,11 @@ export default class GoodsSkus extends Component {
           style={{ padding: '0 30px' }}
           size="small"
           pagination={false}
+          footer={currentPageData => (
+            <div className={styles.tableFooter}>
+              总计：￥ {currentPageData.reduce((a, b) => a + b.sumPrice, 0)}
+            </div>
+          )}
         />
       </Modal>
     );

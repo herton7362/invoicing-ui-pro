@@ -184,11 +184,7 @@ export default class GoodsSkuTable extends Component {
   };
 
   render() {
-    const {
-      goodsTypeAttributes,
-      columns,
-      ...restProps
-    } = this.props;
+    const { goodsTypeAttributes, columns, ...restProps } = this.props;
     const { dataSource } = this.state;
 
     const tableColumns = columns(dataSource);
@@ -205,7 +201,7 @@ export default class GoodsSkuTable extends Component {
       <Fragment>
         {goodsTypeAttributes.length > 0 && (
           <Table
-            rowKey={record => record.skuId}
+            rowKey={record => record.skuId || `${goodsTypeAttributes.map(attr => record[attr.id])}`}
             dataSource={dataSource}
             columns={tableColumns}
             onChange={this.triggerChange}
