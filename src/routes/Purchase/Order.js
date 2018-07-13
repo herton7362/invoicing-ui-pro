@@ -1,8 +1,10 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva/index';
-import { Card, Form, message, Divider, Popconfirm, Input, Button, Table } from 'antd';
+import { Card, Form, message, Divider, Popconfirm, Input, Button } from 'antd';
 import { routerRedux } from 'dva/router';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+
+import Table from '../../components/ExtendedTable';
 
 import styles from './Order.less';
 
@@ -84,6 +86,14 @@ export default class OrderList extends PureComponent {
         dataIndex: 'orderNumber',
       },
       {
+        title: '创建日期',
+        dataIndex: 'createdDate',
+      },
+      {
+        title: '供应商',
+        dataIndex: 'businessRelatedUnit.name',
+      },
+      {
         title: '预订交货日期',
         dataIndex: 'deliveryDate',
       },
@@ -92,8 +102,10 @@ export default class OrderList extends PureComponent {
         dataIndex: 'warehouse.name',
       },
       {
-        title: '供应商',
-        dataIndex: 'businessRelatedUnit.name',
+        title: '总计',
+        dataIndex: 'sumPrice',
+        align: 'right',
+        render: val => `￥${val}`,
       },
       {
         title: '状态',
@@ -131,6 +143,11 @@ export default class OrderList extends PureComponent {
       pageSize,
     };
 
+    const pinnedBottomData = [
+      { orderNumber: `合计：` },
+      { sumPrice: `￥${list ? list.reduce((a, b) => a + b.sumPrice, 0) : 0}` },
+    ];
+
     return (
       <PageHeaderLayout>
         <Card
@@ -152,6 +169,7 @@ export default class OrderList extends PureComponent {
             pagination={paginationProps}
             columns={columns}
             onChange={this.handleStandardTableChange}
+            pinnedBottomData={pinnedBottomData}
           />
         </Card>
       </PageHeaderLayout>

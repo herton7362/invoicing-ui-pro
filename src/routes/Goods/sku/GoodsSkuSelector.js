@@ -229,11 +229,6 @@ export default class GoodsSkus extends Component {
           style={{ padding: '0 30px' }}
           size="small"
           pagination={false}
-          footer={currentPageData => (
-            <div className={styles.tableFooter}>
-              总计：￥ {currentPageData.reduce((a, b) => a + b.sumPrice, 0)}
-            </div>
-          )}
         />
       </Modal>
     );

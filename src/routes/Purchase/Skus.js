@@ -3,9 +3,10 @@ import React, { Component } from 'react';
 import { connect } from 'dva/index';
 
 import PropTypes from 'prop-types';
-import { Table, InputNumber } from 'antd';
+import { InputNumber } from 'antd';
 import GoodsSelector from '../Goods/GoodsSelector';
 import GoodsSkuSelector from '../Goods/sku/GoodsSkuSelector';
+import Table from '../../components/ExtendedTable';
 
 import styles from './Skus.less';
 
@@ -202,6 +203,13 @@ export default class GoodsTypeSelector extends Component {
       onCancel: this.handleModalVisible,
     };
 
+    const pinnedBottomData = [
+      { 'goods.name': `合计：` },
+      { price: `￥${value ? value.reduce((a, b) => a + b.price, 0) : 0}` },
+      { count: `${value ? value.reduce((a, b) => a + b.count, 0) : 0}` },
+      { sumPrice: `￥${value ? value.reduce((a, b) => a + b.sumPrice, 0) : 0}` },
+    ];
+
     return (
       <div className={styles.goodsSkus}>
         <Table
@@ -209,11 +217,7 @@ export default class GoodsTypeSelector extends Component {
           dataSource={value}
           pagination={false}
           columns={columns}
-          footer={currentPageData => (
-            <div className={styles.tableFooter}>
-              总计：￥ {currentPageData.reduce((a, b) => a + b.sumPrice, 0)}
-            </div>
-          )}
+          pinnedBottomData={pinnedBottomData}
         />
         <GoodsSelector onChange={this.onSelectGoods} />
         <GoodsSkuSelector
