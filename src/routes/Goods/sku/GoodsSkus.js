@@ -6,13 +6,13 @@ import PropTypes from 'prop-types';
 import GoodsSkuTable from './GoodsSkuTable';
 
 export default class GoodsSkus extends Component {
-  static defaultProps = {
-    goodsAttributes: [],
-  };
-
   static propTypes = {
     goodsTypeAttributes: PropTypes.array.isRequired,
     goodsAttributes: PropTypes.array,
+  };
+
+  static defaultProps = {
+    goodsAttributes: [],
   };
 
   triggerChange = changedValue => {

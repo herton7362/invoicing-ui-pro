@@ -5,17 +5,17 @@ import PropTypes from 'prop-types';
 
 // 可根据传入的attribute来生成对应的sku，并且返回新的value
 export default class GoodsSkuTable extends Component {
-  static defaultProps = {
-    value: [],
-    valueChangeFilter: changedValue => changedValue,
-  };
-
   static propTypes = {
     value: PropTypes.array,
     goodsAttributes: PropTypes.array.isRequired,
     goodsTypeAttributes: PropTypes.array.isRequired,
     columns: PropTypes.func.isRequired,
     valueChangeFilter: PropTypes.func,
+  };
+
+  static defaultProps = {
+    value: [],
+    valueChangeFilter: changedValue => changedValue,
   };
 
   state = {

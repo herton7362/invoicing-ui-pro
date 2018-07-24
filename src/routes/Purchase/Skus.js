@@ -1,25 +1,26 @@
 import React, { Component } from 'react';
 
 import { connect } from 'dva/index';
-
 import PropTypes from 'prop-types';
-import { InputNumber } from 'antd';
+import { InputNumber, Table } from 'antd';
 import GoodsSelector from '../Goods/GoodsSelector';
 import GoodsSkuSelector from '../Goods/sku/GoodsSkuSelector';
-import Table from '../../components/ExtendedTable';
+import { PinnedData } from '../../components/ExtendedTable';
 
 import styles from './Skus.less';
+
+const ExtendedTable = PinnedData()(Table);
 
 @connect(({ goods }) => ({
   goods,
 }))
 export default class GoodsTypeSelector extends Component {
-  static defaultProps = {
-    businessRelatedUnitId: null,
-  };
-
   static propTypes = {
     businessRelatedUnitId: PropTypes.string,
+  };
+
+  static defaultProps = {
+    businessRelatedUnitId: null,
   };
 
   state = {
@@ -212,12 +213,13 @@ export default class GoodsTypeSelector extends Component {
 
     return (
       <div className={styles.goodsSkus}>
-        <Table
+        <ExtendedTable
           rowKey={row => row.skuId}
           dataSource={value}
           pagination={false}
           columns={columns}
           pinnedBottomData={pinnedBottomData}
+          size="middle"
         />
         <GoodsSelector onChange={this.onSelectGoods} />
         <GoodsSkuSelector

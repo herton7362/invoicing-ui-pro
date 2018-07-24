@@ -1,14 +1,16 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva/index';
-import { Card, Form, message, Divider, Popconfirm, Input, Button } from 'antd';
+import { Card, Form, message, Divider, Popconfirm, Input, Button, Table } from 'antd';
 import { routerRedux } from 'dva/router';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
-import Table from '../../components/ExtendedTable';
+import { PinnedData } from '../../components/ExtendedTable';
 
 import styles from './Order.less';
 
 const { Search } = Input;
+
+const ExtendedTable = PinnedData()(Table);
 
 @connect(({ purchaseOrder, loading }) => ({
   purchaseOrder,
@@ -56,15 +58,18 @@ export default class OrderList extends PureComponent {
   };
 
   handleOpenAddPage = () => {
-    this.props.dispatch(routerRedux.push('/purchase/add'));
+    const { dispatch } = this.props;
+    dispatch(routerRedux.push('/purchase/add'));
   };
 
   handleOpenEditPage = id => {
-    this.props.dispatch(routerRedux.push(`/purchase/edit/${id}`));
+    const { dispatch } = this.props;
+    dispatch(routerRedux.push(`/purchase/edit/${id}`));
   };
 
   handleRemove = id => {
-    this.props.dispatch({
+    const { dispatch } = this.props;
+    dispatch({
       type: 'purchaseOrder/remove',
       payload: {
         id,
@@ -162,7 +167,7 @@ export default class OrderList extends PureComponent {
               新建
             </Button>
           </div>
-          <Table
+          <ExtendedTable
             rowKey="id"
             loading={loading}
             dataSource={list}
