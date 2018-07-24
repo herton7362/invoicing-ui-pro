@@ -5,6 +5,7 @@ const PinnedDataTable = () => {
     return class ExtendedTable extends Component {
       render() {
         const { columns } = this.props;
+        const selfProps = {...this.props};
 
         const renderTd = pinnedData => columns.map(column => {
           const key = column.dataIndex || column.key;
@@ -19,8 +20,12 @@ const PinnedDataTable = () => {
           }
         });
 
-        const BodyWrapper = props => {
+        selfProps.components = selfProps.components || {};
+        selfProps.components.body = selfProps.components.body || {};
+
+        selfProps.components.body.wrapper = props => {
           const {pinnedTopData, pinnedBottomData} = this.props;
+
           return (
             <tbody {...props}>
               <Fragment>
@@ -39,15 +44,11 @@ const PinnedDataTable = () => {
             </tbody>
           );
         };
-        return React.createElement(element, {
-          ...this.props,
-          components: {
-            body: { wrapper: BodyWrapper },
-          },
-        });
+
+        return React.createElement(element, selfProps);
       }
     }
   }
-}
+};
 
 export default PinnedDataTable;

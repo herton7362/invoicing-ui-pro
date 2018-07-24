@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 
 import { connect } from 'dva/index';
 import PropTypes from 'prop-types';
-import { InputNumber, Table } from 'antd';
+import { Table } from 'antd';
 import GoodsSelector from '../Goods/GoodsSelector';
 import GoodsSkuSelector from '../Goods/sku/GoodsSkuSelector';
-import { PinnedData } from '../../components/ExtendedTable';
+import { PinnedData, EditableRow } from '../../components/ExtendedTable';
 
 import styles from './Skus.less';
 
-const ExtendedTable = PinnedData()(Table);
+const ExtendedTable = EditableRow()(PinnedData()(Table));
 
 @connect(({ goods }) => ({
   goods,
@@ -134,61 +134,22 @@ export default class GoodsTypeSelector extends Component {
         title: '单价',
         dataIndex: 'price',
         width: 130,
-        align: 'center',
-        render: (rowValue, record, index) => (
-          <InputNumber
-            size="small"
-            value={rowValue}
-            onChange={val => {
-              const dataSource = value;
-              dataSource[index].price = val;
-              dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
-              this.setState({ value: dataSource });
-              this.triggerChange(dataSource);
-            }}
-            style={{ width: '100px' }}
-          />
-        ),
+        align: 'right',
+        editable: true,
       },
       {
         title: '数量',
         dataIndex: 'count',
         width: 130,
-        align: 'center',
-        render: (rowValue, record, index) => (
-          <InputNumber
-            size="small"
-            value={rowValue}
-            min={0}
-            onChange={val => {
-              const dataSource = value;
-              dataSource[index].count = val;
-              dataSource[index].sumPrice = dataSource[index].count * dataSource[index].price;
-              this.setState({ value: dataSource });
-              this.triggerChange(dataSource);
-            }}
-            style={{ width: '100px' }}
-          />
-        ),
+        align: 'right',
+        editable: true,
       },
       {
         title: '金额',
         dataIndex: 'sumPrice',
         width: 130,
-        align: 'center',
-        render: (rowValue, record, index) => (
-          <InputNumber
-            size="small"
-            value={rowValue}
-            onChange={val => {
-              const dataSource = value;
-              dataSource[index].sumPrice = val;
-              this.setState({ value: dataSource });
-              this.triggerChange(dataSource);
-            }}
-            style={{ width: '100px' }}
-          />
-        ),
+        align: 'right',
+        editable: true,
       },
       {
         title: '操作',
