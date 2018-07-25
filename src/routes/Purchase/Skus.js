@@ -97,14 +97,6 @@ export default class GoodsTypeSelector extends Component {
     });
   };
 
-  handleRemove = index => {
-    const { value = [] } = this.state;
-    value.splice(index, 1);
-    const result = this.mergeCell([...value]);
-    this.setState(result);
-    this.triggerChange(result);
-  };
-
   handleModalVisible = flag => {
     this.setState({
       modalVisible: !!flag,
@@ -135,27 +127,38 @@ export default class GoodsTypeSelector extends Component {
         dataIndex: 'price',
         width: 130,
         align: 'right',
-        editable: true,
+        editor: {
+          type: 'number',
+          size: 'small',
+          onChange: (val, record) => {
+            const newRecord = record;
+            newRecord.sumPrice = newRecord.count * val;
+          },
+        },
       },
       {
         title: '数量',
         dataIndex: 'count',
         width: 130,
         align: 'right',
-        editable: true,
+        editor: {
+          type: 'number',
+          size: 'small',
+          onChange: (val, record) => {
+            const newRecord = record;
+            newRecord.sumPrice = val * newRecord.price;
+          },
+        },
       },
       {
         title: '金额',
         dataIndex: 'sumPrice',
         width: 130,
         align: 'right',
-        editable: true,
-      },
-      {
-        title: '操作',
-        width: 120,
-        align: 'center',
-        render: (val, record, index) => <a onClick={() => this.handleRemove(index)}>删除</a>,
+        editor: {
+          type: 'number',
+          size: 'small',
+        },
       },
     ];
 
@@ -172,6 +175,12 @@ export default class GoodsTypeSelector extends Component {
       { sumPrice: `￥${value ? value.reduce((a, b) => a + b.sumPrice, 0) : 0}` },
     ];
 
+    const onChange = (data) => {
+      const result = this.mergeCell([...data]);
+      this.setState(result);
+      this.triggerChange(result);
+    }
+
     return (
       <div className={styles.goodsSkus}>
         <ExtendedTable
@@ -181,6 +190,7 @@ export default class GoodsTypeSelector extends Component {
           columns={columns}
           pinnedBottomData={pinnedBottomData}
           size="middle"
+          onChange={onChange}
         />
         <GoodsSelector onChange={this.onSelectGoods} />
         <GoodsSkuSelector

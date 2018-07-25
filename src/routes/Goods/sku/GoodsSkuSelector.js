@@ -13,12 +13,12 @@ import styles from './GoodsSkuSelector.less';
   goodsTypeAttribute,
 }))
 export default class GoodsSkus extends Component {
-  static defaultProps = {
-    businessRelatedUnitId: null,
-  };
-
   static propTypes = {
     businessRelatedUnitId: PropTypes.string,
+  };
+
+  static defaultProps = {
+    businessRelatedUnitId: null,
   };
 
   constructor() {
@@ -70,7 +70,7 @@ export default class GoodsSkus extends Component {
       return Object.assign(goodsSku, {
         id: null,
         goodsId: goods.id,
-        goods: Object.assign(goods, { goodsSkus: null }),
+        goods: Object.assign({}, goods, { goodsSkus: null }),
         skuId: goodsSku.skuId || goodsSku.id,
         attributeName: attributeNameFormat(goodsSku),
         price,
