@@ -23,6 +23,7 @@ export default (EditableContext) => {
         record,
         rowKey,
         editor,
+        handleEdit,
         ...restProps
       } = this.props;
 
@@ -32,8 +33,21 @@ export default (EditableContext) => {
             const { getFieldDecorator } = form;
 
             return (
-              <td {...restProps}>
-                {editing ? (
+              <td
+                {...restProps}
+                onClick={() => {
+                  if(editing) {
+                    return;
+                  }
+                  if (typeof rowKey === 'string') {
+                    handleEdit(record[rowKey]);
+                  }
+                  if (typeof rowKey === 'function') {
+                    handleEdit(rowKey(record));
+                  }
+                }}
+              >
+                {(editing && editor) ? (
                   <FormItem style={{ margin: 0 }}>
                     {getFieldDecorator(dataIndex, {
                       rules: [{

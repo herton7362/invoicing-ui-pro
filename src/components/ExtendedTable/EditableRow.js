@@ -93,9 +93,6 @@ const EditableTable = () => {
         const { data } = this.state;
 
         selfProps.columns = [...columns.map((col) => {
-            if (!col.editor) {
-              return col;
-            }
             return {
               ...col,
               onCell: record => ({
@@ -103,10 +100,12 @@ const EditableTable = () => {
                 inputType: col.dataIndex === 'age' ? 'number' : 'text',
                 dataIndex: col.dataIndex,
                 title: col.title,
-                editor: Object.assign({
+                editor: col.editor ? Object.assign({
                   size: selfProps.size,
-                }, col.editor),
+                }, col.editor) : false,
                 editing: this.isEditing(record),
+                handleEdit: this.edit,
+                rowKey,
               }),
             };
           }),
@@ -138,12 +137,7 @@ const EditableTable = () => {
                         )}
                       </EditableContext.Consumer>
                       <Divider type="vertical" />
-                      <Popconfirm
-                        title="您确定取消编辑吗？"
-                        onConfirm={() => this.cancel(key)}
-                      >
-                        <a>取消</a>
-                      </Popconfirm>
+                      <a onClick={() => this.cancel(key)}>取消</a>
                     </span>
                   ) : (
                     <span>

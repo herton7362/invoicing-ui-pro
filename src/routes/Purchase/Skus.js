@@ -40,12 +40,14 @@ export default class GoodsTypeSelector extends Component {
 
     const matchedRows = value.filter(row1 => goodsSkus.some(row2 => row2.skuId === row1.skuId));
     const restRows = goodsSkus.filter(row1 => matchedRows.every(row2 => row2.skuId !== row1.skuId));
-    const increaseCount = rows => {
-      rows.forEach(row =>
-        Object.assign(row, {
-          count: row.count + goodsSkus.find(sku => sku.skuId === row.skuId).count,
-        })
-      );
+    const increaseCountAndSumPrice = rows => {
+      rows.forEach(row => {
+        const tempSku = goodsSkus.find(sku => sku.skuId === row.skuId);
+        return Object.assign(row, {
+            count: row.count + tempSku.count,
+            sumPrice: row.sumPrice + tempSku.count * tempSku.price,
+        });
+      });
     };
     const appendNewSkus = rows => {
       value.push(
@@ -58,7 +60,7 @@ export default class GoodsTypeSelector extends Component {
     };
     const filter = result => [...result.filter(row => row.count > 0)];
 
-    increaseCount(matchedRows);
+    increaseCountAndSumPrice(matchedRows);
     appendNewSkus(restRows);
     this.triggerChange(filter(value));
   };
@@ -132,7 +134,7 @@ export default class GoodsTypeSelector extends Component {
           size: 'small',
           onChange: (val, record) => {
             const newRecord = record;
-            newRecord.sumPrice = newRecord.count * val;
+            newRecord.sumPrice = newRecord.count * (val || 0);
           },
         },
       },
@@ -146,7 +148,7 @@ export default class GoodsTypeSelector extends Component {
           size: 'small',
           onChange: (val, record) => {
             const newRecord = record;
-            newRecord.sumPrice = val * newRecord.price;
+            newRecord.sumPrice = (val || 0) * newRecord.price;
           },
         },
       },
