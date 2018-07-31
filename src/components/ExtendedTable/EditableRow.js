@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component, Fragment} from 'react';
 import { Form, Popconfirm, Divider } from 'antd';
 
 import EditableCell from './EditableCell';
@@ -15,7 +15,7 @@ const EditableFormRow = Form.create()(EditableRow);
 const EditableContextCell = EditableCell(EditableContext);
 
 
-const EditableTable = () => {
+const EditableTable = ({ deleteAble = true } = {}) => {
   return element => {
     return class ExtendedTable extends Component {
       state = {
@@ -142,13 +142,17 @@ const EditableTable = () => {
                   ) : (
                     <span>
                       <a onClick={() => this.edit(key)}>编辑</a>
-                      <Divider type="vertical" />
-                      <Popconfirm
-                        title="您确定删除吗？"
-                        onConfirm={() => this.remove(index)}
-                      >
-                        <a>删除</a>
-                      </Popconfirm>
+                      {deleteAble && (
+                        <Fragment>
+                          <Divider type="vertical" />
+                          <Popconfirm
+                            title="您确定删除吗？"
+                            onConfirm={() => this.remove(index)}
+                          >
+                            <a>删除</a>
+                          </Popconfirm>
+                        </Fragment>
+                      )}
                     </span>
                   )}
                 </div>

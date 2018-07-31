@@ -117,6 +117,11 @@ export const getRouterData = app => {
         import('../routes/Supplier/Supplier')
       ),
     },
+    '/transfer/edit/:id': {
+      component: dynamicWrapper(app, ['transferOrder', 'warehouse', 'businessRelatedUnit', 'goods'], () =>
+        import('../routes/Transfer/Form')
+      ),
+    },
 
     '/dashboard/analysis': {
       component: dynamicWrapper(app, ['chart'], () => import('../routes/Dashboard/Analysis')),

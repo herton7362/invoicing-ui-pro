@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 
 import { connect } from 'dva/index';
 import { routerRedux } from 'dva/router';
-import { Card, Form, Button, DatePicker, Input, message, Row, Col } from 'antd';
+import { Card, Form, Button, DatePicker, message, Row, Col } from 'antd';
 import moment from 'moment';
 import FooterToolbar from 'components/FooterToolbar';
 import DescriptionList from 'components/DescriptionList';
@@ -15,101 +15,48 @@ import styles from './Form.less';
 
 const FormItem = Form.Item;
 const { Description } = DescriptionList;
-const { TextArea } = Input;
 
-@connect(({ purchaseOrder, loading }) => ({
-  purchaseOrder,
-  submitting: loading.effects['purchaseOrder/save'],
+@connect(({ transferOrder, loading }) => ({
+  transferOrder,
+  submitting: loading.effects['transferOrder/save'],
 }))
-@Form.create({
-  mapPropsToFields(props) {
-    const { purchaseOrder: { formData } } = props;
-
-    return {
-      businessRelatedUnitId: Form.createFormField({
-        value: formData.businessRelatedUnitId,
-      }),
-      operator: Form.createFormField({
-        value: formData.operator,
-      }),
-      bookTransferDate: Form.createFormField({
-        value: formData.bookTransferDate ? moment(formData.bookTransferDate) : null,
-      }),
-      warehouseId: Form.createFormField({
-        value: formData.warehouseId,
-      }),
-      remark: Form.createFormField({
-        value: formData.remark,
-      }),
-      items: Form.createFormField({
-        value: formData.items,
-      }),
-    };
-  },
-  onValuesChange(props, changedValues, allValues) {
-    const { dispatch, purchaseOrder: { formData } } = props;
-    const payload = Object.assign(formData, allValues);
-
-    dispatch({
-      type: 'purchaseOrder/saveForm',
-      payload,
-    });
-  },
-})
-export default class GoodsForm extends PureComponent {
+@Form.create()
+export default class TransferForm extends PureComponent {
   componentDidMount() {
     const { dispatch, match: { params: { id } } } = this.props;
     if (id) {
       dispatch({
-        type: 'purchaseOrder/fetchOne',
+        type: 'transferOrder/fetchOne',
         payload: { id },
       });
     } else {
       dispatch({
-        type: 'purchaseOrder/saveForm',
+        type: 'transferOrder/saveForm',
         payload: {},
       });
     }
   }
 
-  handleSubmit = (fieldsValue, status) => {
-    const { form, dispatch, purchaseOrder: { formData } } = this.props;
-
-    form.resetFields();
-    dispatch({
-      type: 'purchaseOrder/save',
-      payload: {
-        ...formData,
-        ...fieldsValue,
-        status,
-      },
-    }).then(() => {
-      message.success('保存成功');
-      this.handleGoBack();
-    });
-  };
-
-  handleSave = e => {
-    e.preventDefault();
-    const { form } = this.props;
-    const fieldsValue = form.getFieldsValue();
-    this.handleSubmit(fieldsValue, 'DRAFT');
-  };
-
   handleConfirm = e => {
     e.preventDefault();
-    const { form } = this.props;
+    const { form, dispatch, transferOrder: { formData } } = this.props;
+
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      this.handleSubmit(fieldsValue, 'CONFIRMED');
+      form.resetFields();
+      dispatch({
+        type: 'transferOrder/save',
+        payload: {
+          ...formData,
+          ...fieldsValue,
+          status: 'COMPLETED',
+        },
+      }).then(() => {
+        message.success('保存成功');
+        this.handleGoBack();
+      });
     });
   };
-
-  handleTransfer = e => {
-    e.preventDefault();
-    const { dispatch, purchaseOrder: { formData: { transferOrderId } } } = this.props;
-    dispatch(routerRedux.push(`/transfer/edit/${transferOrderId}`));
-  }
 
   handleGoBack = () => {
     const { dispatch } = this.props;
@@ -117,7 +64,7 @@ export default class GoodsForm extends PureComponent {
   };
 
   render() {
-    const { submitting, purchaseOrder: { formData }, form: { getFieldDecorator, getFieldsError } } = this.props;
+    const { submitting, transferOrder: { formData }, form: { getFieldDecorator, getFieldsError } } = this.props;
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
@@ -140,18 +87,15 @@ export default class GoodsForm extends PureComponent {
       <DescriptionList size="small" col="2">
         <Description term="创建人">{formData.createUserName}</Description>
         <Description term="创建时间">{formData.createdDate}</Description>
+        <Description term="关联单据">{formData.originOrderNumber}</Description>
       </DescriptionList>
     );
 
     const extra = (
       <Row>
-        <Col xs={24} sm={12}>
+        <Col xs={24} sm={24}>
           <div className={styles.textSecondary}>状态</div>
           <div className={styles.heading}>{formData.statusName}</div>
-        </Col>
-        <Col xs={24} sm={12}>
-          <div className={styles.textSecondary}>收货状态</div>
-          <div className={styles.heading}>{formData.transferStatusName}</div>
         </Col>
       </Row>
     );
@@ -176,16 +120,18 @@ export default class GoodsForm extends PureComponent {
                       message: '请选择一个供应商',
                     },
                   ],
+                  initialValue: formData.businessRelatedUnitId,
                 })(<SupplierSelector style={{ width: 300 }} />)}
               </FormItem>
-              <FormItem {...formItemLayout} label="预订交货日期">
-                {getFieldDecorator('bookTransferDate', {
+              <FormItem {...formItemLayout} label="交货日期">
+                {getFieldDecorator('transferredDate', {
                   rules: [
                     {
                       required: true,
                       message: '请选择交货日期',
                     },
                   ],
+                  initialValue: formData.transferredDate ? moment(formData.transferredDate) : null,
                 })(<DatePicker />)}
               </FormItem>
               <FormItem {...formItemLayout} label="交货到">
@@ -196,46 +142,25 @@ export default class GoodsForm extends PureComponent {
                       message: '请选择交货仓库',
                     },
                   ],
+                  initialValue: formData.warehouseId,
                 })(<WarehouseSelector style={{ width: 300 }} />)}
-              </FormItem>
-              <FormItem {...formItemLayout} label="附加说明">
-                {getFieldDecorator('remark')(
-                  <TextArea
-                    style={{ minHeight: 32 }}
-                    placeholder="你可以填写一个附加说明"
-                    rows={4}
-                  />
-                )}
               </FormItem>
             </Card>
 
             <Card style={{ marginTop: 24 }} bordered={false} title="商品信息">
               <FormItem>
-                {getFieldDecorator('items')(
-                  <Skus businessRelatedUnitId={formData.businessRelatedUnitId} />
+                {getFieldDecorator('items', {
+                  initialValue: formData.items,
+                })(
+                  <Skus />
                 )}
               </FormItem>
             </Card>
 
             <FooterToolbar getFieldsError={getFieldsError} fieldLabels={fieldLabels}>
-              {formData.transferOrderId && (
-                <Button
-                  type="primary"
-                  icon="car"
-                  onClick={this.handleTransfer}
-                  loading={submitting}
-                >
-                  接收产品
-                </Button>
-              )}
-              {formData.status !== 'CONFIRMED' && (
+              {formData.status !== 'COMPLETED' && (
                 <Button type="primary" onClick={this.handleConfirm} loading={submitting}>
                   确认订单
-                </Button>
-              )}
-              {formData.status !== 'CONFIRMED' && (
-                <Button type="primary" onClick={this.handleSave} loading={submitting}>
-                  保存
                 </Button>
               )}
               <Button icon="left" style={{ marginLeft: 8 }} onClick={this.handleGoBack}>

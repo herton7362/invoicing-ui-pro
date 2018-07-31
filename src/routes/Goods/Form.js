@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva/index';
 import { routerRedux } from 'dva/router';
-import { Card, Form, Button, Input, InputNumber, Popover, Icon, message } from 'antd';
+import { Card, Form, Button, Input, InputNumber, message } from 'antd';
 import Pinyin from 'components/Pinyin';
 import FooterToolbar from 'components/FooterToolbar';
 import numeral from 'numeral';
@@ -14,15 +14,8 @@ import Cover from './Cover';
 import AttributeCheckboxGroup from './AttributeCheckboxGroup';
 import SupplierSelectTable from './SupplierSelectTable';
 
-import styles from './Form.less';
-
 const FormItem = Form.Item;
 const { TextArea } = Input;
-
-const fieldLabels = {
-  goodsCategoryId: '内部分类',
-  name: '商品名称',
-};
 
 @connect(({ goods, goodsTypeAttribute, loading }) => ({
   goods,
@@ -101,10 +94,6 @@ const fieldLabels = {
   },
 })
 export default class GoodsForm extends PureComponent {
-  state = {
-    width: '100%',
-  };
-
   componentDidMount() {
     const { dispatch, match: { params: { id } } } = this.props;
     if (id) {
@@ -122,12 +111,6 @@ export default class GoodsForm extends PureComponent {
       });
       this.handleLoadAttributes();
     }
-
-    window.addEventListener('resize', this.resizeFooterToolbar);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.resizeFooterToolbar);
   }
 
   handleSubmit = e => {
@@ -152,7 +135,8 @@ export default class GoodsForm extends PureComponent {
   };
 
   handleGoBack = () => {
-    this.props.dispatch(routerRedux.push('/goods/list'));
+    const { dispatch } = this.props;
+    dispatch(routerRedux.goBack());
   };
 
   handleLoadAttributes = goodsTypeId => {
@@ -176,64 +160,13 @@ export default class GoodsForm extends PureComponent {
     return goodsTypeId;
   };
 
-  resizeFooterToolbar = () => {
-    const sider = document.querySelectorAll('.ant-layout-sider')[0];
-    const width = `calc(100% - ${sider.style.width})`;
-    if (this.state.width !== width) {
-      this.setState({ width });
-    }
-  };
-
   render() {
     const {
       submitting,
       goods: { formData },
       goodsTypeAttribute: { data: { list: goodsTypeAttributes = [] } },
+      form: { getFieldDecorator, setFieldsValue, getFieldsError },
     } = this.props;
-    const { getFieldDecorator, setFieldsValue, getFieldsError } = this.props.form;
-
-    const errors = getFieldsError();
-
-    const getErrorInfo = () => {
-      const excludeKey = ['goodsAttributes'];
-      const errorCount = Object.keys(errors).filter(key => errors[key] && !excludeKey.includes(key))
-        .length;
-      if (!errors || errorCount === 0) {
-        return null;
-      }
-      const scrollToField = fieldKey => {
-        const labelNode = document.querySelector(`label[for="${fieldKey}"]`);
-        if (labelNode) {
-          labelNode.scrollIntoView(true);
-        }
-      };
-      const errorList = Object.keys(errors).map(key => {
-        if (!errors[key] || excludeKey.includes(key)) {
-          return null;
-        }
-        return (
-          <li key={key} className={styles.errorListItem} onClick={() => scrollToField(key)}>
-            <Icon type="cross-circle-o" className={styles.errorIcon} />
-            <div className={styles.errorMessage}>{errors[key][0]}</div>
-            <div className={styles.errorField}>{fieldLabels[key]}</div>
-          </li>
-        );
-      });
-      return (
-        <span className={styles.errorIcon}>
-          <Popover
-            title="表单校验信息"
-            content={errorList}
-            overlayClassName={styles.errorPopover}
-            trigger="click"
-            getPopupContainer={trigger => trigger.parentNode}
-          >
-            <Icon type="exclamation-circle" />
-          </Popover>
-          {errorCount}
-        </span>
-      );
-    };
 
     const formItemLayout = {
       labelCol: {
@@ -246,6 +179,13 @@ export default class GoodsForm extends PureComponent {
         md: { span: 10 },
       },
     };
+
+    const fieldLabels = {
+      goodsCategoryId: '内部分类',
+      name: '商品名称',
+    };
+
+    const excludeKeys = ['goodsAttributes']
 
     return (
       <PageHeaderLayout>
@@ -432,8 +372,7 @@ export default class GoodsForm extends PureComponent {
               </FormItem>
             </Card>
 
-            <FooterToolbar style={{ width: this.state.width }}>
-              {getErrorInfo()}
+            <FooterToolbar getFieldsError={getFieldsError} excludeKeys={excludeKeys} fieldLabels={fieldLabels}>
               <Button type="primary" onClick={this.handleSubmit} loading={submitting}>
                 提交
               </Button>

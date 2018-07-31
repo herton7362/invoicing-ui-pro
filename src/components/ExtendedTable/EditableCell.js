@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { Input, InputNumber, Form } from 'antd';
 
+import styles from './EditableCell.less';
+
 const FormItem = Form.Item;
 
-export default (EditableContext) => {
+export default EditableContext => {
   const EditableContextConsumer = EditableContext.Consumer;
   return class EditableCell extends Component {
     getInput = () => {
@@ -48,7 +50,7 @@ export default (EditableContext) => {
                 }}
               >
                 {(editing && editor) ? (
-                  <FormItem style={{ margin: 0 }}>
+                  <FormItem className={styles.formItem}>
                     {getFieldDecorator(dataIndex, {
                       rules: [{
                         required: true,
