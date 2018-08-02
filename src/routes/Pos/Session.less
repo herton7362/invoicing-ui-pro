@@ -1,0 +1,32 @@
+@import '~antd/lib/style/themes/default.less';
+.card {
+  width: 120px;
+  height: 140px;
+  float: left;
+  margin-right: @padding-md;
+  :global {
+    .ant-card-body{
+      padding: @padding-xs;
+    }
+    .ant-card-meta-avatar {
+      height: 102px;
+      overflow: hidden;
+      padding-right: 0;
+      float: none;
+    }
+    .ant-card-meta {
+      margin: 0;
+    }
+  }
+  .cardAvatar {
+    width: 100%;
+  }
+  .cardTitle {
+    font-size: @font-size-sm;
+    color: @text-color;
+  }
+}
+
+.clearBoth {
+  clear: both;
+}

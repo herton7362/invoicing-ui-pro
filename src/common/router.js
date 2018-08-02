@@ -122,6 +122,9 @@ export const getRouterData = app => {
         import('../routes/Transfer/Form')
       ),
     },
+    '/pos/session': {
+      component: dynamicWrapper(app, ['posSession'], () =>import('../routes/Pos/Session')),
+    },
 
     '/dashboard/analysis': {
       component: dynamicWrapper(app, ['chart'], () => import('../routes/Dashboard/Analysis')),

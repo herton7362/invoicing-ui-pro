@@ -32,13 +32,17 @@ const menuData = [
     ],
   },
   {
-    name: '批零',
+    name: 'POS',
     icon: 'pay-circle-o',
-    path: 'sale',
+    path: 'pos',
     children: [
       {
-        name: '零售开单',
-        path: 'sale-form',
+        name: '打开会话',
+        path: 'session',
+      },
+      {
+        name: 'POS产品类别',
+        path: 'goods-category',
       },
     ],
   },

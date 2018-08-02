@@ -100,7 +100,7 @@ export default class OrderList extends PureComponent {
       },
       {
         title: '预订交货日期',
-        dataIndex: 'deliveryDate',
+        dataIndex: 'bookTransferDate',
       },
       {
         title: '交货到',
@@ -114,18 +114,17 @@ export default class OrderList extends PureComponent {
       },
       {
         title: '状态',
-        dataIndex: 'status',
-        render: val => {
-          const status = {
-            CANCEL: '已取消',
-            DRAFT: '草稿',
-            CONFIRMED: '已确认',
-          };
-          return status[val];
-        },
+        align: 'center',
+        dataIndex: 'statusName',
+      },
+      {
+        title: '收货状态',
+        align: 'center',
+        dataIndex: 'transferStatusName',
       },
       {
         title: '操作',
+        align: 'center',
         render: (val, record) => (
           <Fragment>
             <a onClick={() => this.handleOpenEditPage(record.id)}>编辑</a>
